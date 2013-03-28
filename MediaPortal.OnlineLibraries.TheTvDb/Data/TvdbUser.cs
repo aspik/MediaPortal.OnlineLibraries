@@ -30,10 +30,12 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data
   public class TvdbUser
   {
     #region private properties
-    private String _userName;
-    private String _userIdentifier;
-    private TvdbLanguage _userPreferredLanguage;
+
     private List<int> _userFavorites;
+    private String _userIdentifier;
+    private String _userName;
+    private TvdbLanguage _userPreferredLanguage;
+
     #endregion
 
     /// <summary>
@@ -51,10 +53,7 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data
     /// <summary>
     /// TvdbUser constructor
     /// </summary>
-    public TvdbUser()
-    {
-
-    }
+    public TvdbUser() {}
 
     /// <summary>
     /// Preferred language of the user

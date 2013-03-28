@@ -20,8 +20,8 @@
 
 using System;
 using System.Drawing;
-using System.Net;
 using System.IO;
+using System.Net;
 using MediaPortal.OnlineLibraries.TheTvDb.Cache;
 
 namespace MediaPortal.OnlineLibraries.TheTvDb.Data.Banner
@@ -59,7 +59,7 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data.Banner
 
     private readonly object _bannerLoadingLock = new object();
 
-    public TvdbBanner ()
+    public TvdbBanner()
     {
       BannerLoading = false;
     }
@@ -132,12 +132,14 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data.Banner
     /// <returns>true if the banner could be loaded successfully, false otherwise</returns>
     public bool LoadBanner(bool replaceOld)
     {
-      bool wasLoaded = IsLoaded;//is the banner already loaded at this point
+      bool wasLoaded = IsLoaded; //is the banner already loaded at this point
       lock (_bannerLoadingLock)
-      {//if another thread is already loading THIS banner, the lock will block this thread until the other thread
+      {
+        //if another thread is already loading THIS banner, the lock will block this thread until the other thread
         //has finished loading
         if (!wasLoaded && !replaceOld && IsLoaded)
-        {////the banner has already been loaded from a different thread and we don't want to replace it
+        {
+          ////the banner has already been loaded from a different thread and we don't want to replace it
           return false;
         }
 
@@ -148,22 +150,26 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data.Banner
           Image img = null;
           String cacheName = CreateCacheName(BannerPath, false);
           if (CacheProvider != null && CacheProvider.Initialised)
-          {//try to load the image from cache first
+          {
+            //try to load the image from cache first
             img = CacheProvider.LoadImageFromCache(SeriesId, cacheName);
           }
 
           if (img == null)
-          {//couldn't load image from cache -> load it from http://thetvdb.com
+          {
+            //couldn't load image from cache -> load it from http://thetvdb.com
             img = LoadImage(TvdbLinkCreator.CreateBannerLink(BannerPath));
 
             if (img != null && CacheProvider != null && CacheProvider.Initialised)
-            {//store the image to cache
+            {
+              //store the image to cache
               CacheProvider.SaveToCache(img, SeriesId, cacheName);
             }
           }
 
           if (img != null)
-          {//image was successfully loaded
+          {
+            //image was successfully loaded
             BannerImage = img;
             IsLoaded = true;
             BannerLoading = false;
@@ -197,7 +203,8 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data.Banner
     public bool UnloadBanner(bool saveToCache)
     {
       if (BannerLoading)
-      {//banner is currently loading
+      {
+        //banner is currently loading
         Log.Warn("Can't remove banner while it's loading");
         return false;
       }
@@ -208,10 +215,12 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data.Banner
           LoadBanner(null);
         }
         if (!saveToCache)
-        {//we don't want the image in cache -> if we already cached it it should be deleted
+        {
+          //we don't want the image in cache -> if we already cached it it should be deleted
           String cacheName = CreateCacheName(BannerPath, false);
           if (CacheProvider != null && CacheProvider.Initialised)
-          {//try to load the image from cache first
+          {
+            //try to load the image from cache first
             CacheProvider.RemoveImageFromCache(SeriesId, cacheName);
           }
         }
@@ -238,7 +247,7 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data.Banner
       else if (path.Contains("fanart/vignette/"))
         path = path.Replace("fanart/vignette/", "fan-vig-");
       path = path.Replace('/', '_');
-      return (thumb ? "thumb_": "img_") + path;
+      return (thumb ? "thumb_" : "img_") + path;
     }
 
     /// <summary>

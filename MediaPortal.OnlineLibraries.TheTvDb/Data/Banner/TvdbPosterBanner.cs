@@ -49,13 +49,11 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data.Banner
       BannerPath = path;
       Language = lang;
     }
+
     /// <summary>
     /// TvdbPosterBanner constructor
     /// </summary>
-    public TvdbPosterBanner()
-    {
-
-    }
+    public TvdbPosterBanner() {}
 
     /// <summary>
     /// Resolution of the Poster banner

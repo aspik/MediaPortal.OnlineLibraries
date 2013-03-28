@@ -41,8 +41,10 @@ namespace MediaPortal.OnlineLibraries.TheTvDb
   public class TvdbDownloader
   {
     #region private properties
+
     private readonly String _apiKey;
     private readonly TvdbXmlReader _xmlHandler;
+
     #endregion
 
     /// <summary>
@@ -52,18 +54,18 @@ namespace MediaPortal.OnlineLibraries.TheTvDb
     public TvdbDownloader(String apiKey)
     {
       _apiKey = apiKey;
-      _xmlHandler = new TvdbXmlReader();//xml handler (extract xml information into objects)
+      _xmlHandler = new TvdbXmlReader(); //xml handler (extract xml information into objects)
     }
 
     protected string DownloadString(string url)
     {
-      using (WebClient webClient = new WebClient { Encoding = Encoding.UTF8 })
+      using (WebClient webClient = new WebClient {Encoding = Encoding.UTF8})
         return webClient.DownloadString(url);
     }
 
     protected byte[] DownloadData(string url)
     {
-      using (WebClient webClient = new WebClient { Encoding = Encoding.UTF8 })
+      using (WebClient webClient = new WebClient {Encoding = Encoding.UTF8})
         return webClient.DownloadData(url);
     }
 
@@ -104,7 +106,8 @@ namespace MediaPortal.OnlineLibraries.TheTvDb
     {
       Log.Warn("Request not successfull", ex);
       if (ex.Message.Equals("The remote server returned an error: (404) Not Found."))
-        throw new TvdbUserNotFoundException("Couldn't connect to Thetvdb.com to " + action +", are you sure this is the correct user id?");
+        throw new TvdbUserNotFoundException("Couldn't connect to Thetvdb.com to " + action +
+                                            ", are you sure this is the correct user id?");
       throw new TvdbNotAvailableException("Couldn't connect to Thetvdb.com to " + action +
                                           ", check your internet connection and the status of http://thetvdb.com");
     }
@@ -174,7 +177,8 @@ namespace MediaPortal.OnlineLibraries.TheTvDb
     ///                                           or http://forums.thetvdb.com/</para></exception>  
     /// <exception cref="TvdbInvalidApiKeyException">The stored api key is invalid</exception>
     /// <exception cref="TvdbNotAvailableException">The tvdb database is unavailable</exception>
-    public TvdbSeries DownloadSeries(int seriesId, TvdbLanguage language, bool loadEpisodes, bool loadActors, bool loadBanners)
+    public TvdbSeries DownloadSeries(int seriesId, TvdbLanguage language, bool loadEpisodes, bool loadActors,
+                                     bool loadBanners)
     {
       //download the xml data from this request
       String xml = string.Empty;
@@ -198,7 +202,9 @@ namespace MediaPortal.OnlineLibraries.TheTvDb
             List<TvdbEpisode> epList = _xmlHandler.ExtractEpisodes(xml);
             if (epList != null)
             {
-              foreach (KeyValuePair<TvdbLanguage, TvdbSeriesFields> kvp in series.SeriesTranslations.Where(kvp => kvp.Key.Abbriviation.Equals(language.Abbriviation)))
+              foreach (
+                KeyValuePair<TvdbLanguage, TvdbSeriesFields> kvp in
+                  series.SeriesTranslations.Where(kvp => kvp.Key.Abbriviation.Equals(language.Abbriviation)))
               {
                 series.SeriesTranslations[kvp.Key].Episodes = epList;
                 series.SeriesTranslations[kvp.Key].EpisodesLoaded = true;
@@ -276,7 +282,7 @@ namespace MediaPortal.OnlineLibraries.TheTvDb
         {
           Log.Debug("Extracting " + entry.Name);
           byte[] buffer = new byte[zip.Length];
-          int count = zip.Read(buffer, 0, (int)zip.Length);
+          int count = zip.Read(buffer, 0, (int) zip.Length);
           if (entry.Name.Equals(language.Abbriviation + ".xml"))
             seriesString = Encoding.UTF8.GetString(buffer);
           else if (entry.Name.Equals("banners.xml"))
@@ -299,7 +305,9 @@ namespace MediaPortal.OnlineLibraries.TheTvDb
           List<TvdbEpisode> epList = _xmlHandler.ExtractEpisodes(seriesString);
           if (epList != null)
           {
-            foreach (KeyValuePair<TvdbLanguage, TvdbSeriesFields> kvp in series.SeriesTranslations.Where(kvp => kvp.Key.Abbriviation.Equals(language.Abbriviation)))
+            foreach (
+              KeyValuePair<TvdbLanguage, TvdbSeriesFields> kvp in
+                series.SeriesTranslations.Where(kvp => kvp.Key.Abbriviation.Equals(language.Abbriviation)))
             {
               series.SeriesTranslations[kvp.Key].Episodes = epList;
               series.SeriesTranslations[kvp.Key].EpisodesLoaded = true;
@@ -386,7 +394,6 @@ namespace MediaPortal.OnlineLibraries.TheTvDb
     }
 
 
-
     internal TvdbSeriesFields DownloadSeriesFields(int seriesId, TvdbLanguage language)
     {
       String xml = string.Empty;
@@ -441,7 +448,8 @@ namespace MediaPortal.OnlineLibraries.TheTvDb
       }
       catch (WebException ex)
       {
-        throw HandleContentWebException("Couldn't download episode " + episodeId + "(" + language + "), maybe the episode doesn't exist", ex);
+        throw HandleContentWebException(
+          "Couldn't download episode " + episodeId + "(" + language + "), maybe the episode doesn't exist", ex);
       }
     }
 
@@ -461,7 +469,8 @@ namespace MediaPortal.OnlineLibraries.TheTvDb
     ///                                           or http://forums.thetvdb.com/</para></exception>  
     /// <exception cref="TvdbContentNotFoundException">The episode/series/banner couldn't be located on the tvdb server.</exception>
     /// <exception cref="TvdbNotAvailableException">Exception is thrown when thetvdb isn't available.</exception>
-    public TvdbEpisode DownloadEpisode(int seriesId, int seasonNr, int episodeNr, TvdbEpisode.EpisodeOrdering order, TvdbLanguage language)
+    public TvdbEpisode DownloadEpisode(int seriesId, int seasonNr, int episodeNr, TvdbEpisode.EpisodeOrdering order,
+                                       TvdbLanguage language)
     {
       String xml = "";
       String link = "";
@@ -494,7 +503,9 @@ namespace MediaPortal.OnlineLibraries.TheTvDb
       catch (WebException ex)
       {
         throw HandleContentWebException(
-          string.Format("Couldn't download episode {0}/{1}/{2}/{3}/{4}, maybe the episode or the ordering doesn't exist", seriesId, order, seasonNr, episodeNr, language.Abbriviation),
+          string.Format(
+            "Couldn't download episode {0}/{1}/{2}/{3}/{4}, maybe the episode or the ordering doesn't exist", seriesId,
+            order, seasonNr, episodeNr, language.Abbriviation),
           ex);
       }
     }
@@ -539,7 +550,8 @@ namespace MediaPortal.OnlineLibraries.TheTvDb
       catch (WebException ex)
       {
         throw HandleContentWebException(
-          string.Format("Couldn't download episode  for series {0} from {1}({2}), maybe the episode doesn't exist", seriesId, airDate.ToShortDateString(), language.Abbriviation), 
+          string.Format("Couldn't download episode  for series {0} from {1}({2}), maybe the episode doesn't exist",
+                        seriesId, airDate.ToShortDateString(), language.Abbriviation),
           ex);
       }
     }
@@ -619,7 +631,7 @@ namespace MediaPortal.OnlineLibraries.TheTvDb
       }
       catch (WebException ex)
       {
-        throw HandleUserWebException("retrieve favorite list for user "+ userId, ex);
+        throw HandleUserWebException("retrieve favorite list for user " + userId, ex);
       }
       List<int> favList = _xmlHandler.ExtractSeriesFavorites(xml);
       return favList;
@@ -641,9 +653,9 @@ namespace MediaPortal.OnlineLibraries.TheTvDb
     /// <exception cref="TvdbNotAvailableException">Exception is thrown when thetvdb isn't available.</exception>
     public DateTime DownloadUpdate(out List<TvdbSeries> updateSeries, out List<TvdbEpisode> updateEpisodes,
                                    out List<TvdbBanner> updateBanners, int interval,
-                                    bool zipped)
+                                   bool zipped)
     {
-      return DownloadUpdate(out updateSeries, out updateEpisodes, out updateBanners, (Interval)interval, zipped);
+      return DownloadUpdate(out updateSeries, out updateEpisodes, out updateBanners, (Interval) interval, zipped);
     }
 
     /// <summary>
@@ -661,9 +673,8 @@ namespace MediaPortal.OnlineLibraries.TheTvDb
     /// <exception cref="TvdbInvalidApiKeyException">The stored api key is invalid</exception>
     /// <exception cref="TvdbNotAvailableException">Exception is thrown when thetvdb isn't available.</exception>
     public DateTime DownloadUpdate(out List<TvdbSeries> updateSeries, out List<TvdbEpisode> updateEpisodes,
-                                     out List<TvdbBanner> updateBanners, Interval interval, bool zipped)
+                                   out List<TvdbBanner> updateBanners, Interval interval, bool zipped)
     {
-
       String xml = "";
       String link = "";
       try
@@ -675,7 +686,7 @@ namespace MediaPortal.OnlineLibraries.TheTvDb
           ZipInputStream zip = new ZipInputStream(new MemoryStream(data));
           zip.GetNextEntry();
           byte[] buffer = new byte[zip.Length];
-          int count = zip.Read(buffer, 0, (int)zip.Length);
+          int count = zip.Read(buffer, 0, (int) zip.Length);
           xml = Encoding.UTF8.GetString(buffer);
         }
         else

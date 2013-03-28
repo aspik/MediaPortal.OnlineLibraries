@@ -54,29 +54,31 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data
   public class TvdbSeriesFields
   {
     #region private fields
-    private int _id;
-    private String _seriesName;
+
     private List<String> _actors;
     private DayOfWeek? _airsDayOfWeek;
     private String _airsTime;
+    private String _bannerPath;
     private String _contentRating;
+    private List<TvdbEpisode> _episodes;
+    private bool _episodesLoaded;
+    private String _fanartPath;
     private DateTime _firstAired;
     private List<String> _genre;
+    private int _id;
     private String _imdbId;
     private TvdbLanguage _language;
+    private DateTime _lastUpdated;
     private String _network;
     private String _overview;
+    private String _posterPath;
     private double _rating;
     private double _runtime;
-    private int _tvDotComId;
+    private String _seriesName;
     private String _status;
-    private String _bannerPath;
-    private String _fanartPath;
-    private String _posterPath;
-    private DateTime _lastUpdated;
+    private int _tvDotComId;
     private String _zap2itId;
-    private bool _episodesLoaded;
-    private List<TvdbEpisode> _episodes;
+
     #endregion
 
     /// <summary>
@@ -89,60 +91,12 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data
     }
 
     /// <summary>
-    /// Returns a short description of the episode (e.g. 1x20 Episodename)
-    /// </summary>
-    /// <returns>short description of the episode</returns>
-    public override string ToString()
-    {
-      return _seriesName + "[" + _language.Abbriviation + "]";
-    }
-
-    /// <summary>
     /// List of episodes for this translation
     /// </summary>
     public List<TvdbEpisode> Episodes
     {
       get { return _episodes; }
       set { _episodes = value; }
-    }
-
-    /// <summary>
-    /// <para>Gets the episodes for the given Season in the given order (aired or dvd). Absolute is also possible but makes no sense since
-    /// there are no seasons with absoulte ordering. Use GetEpisodesAbsoluteOrder() instead.</para>
-    /// 
-    /// <para>For more information on episode ordering <see href="http://thetvdb.com/wiki/index.php/Category:Episodes">thetvdb wiki</see></para>
-    /// </summary>
-    /// <returns>List of episodes</returns>
-    public List<TvdbEpisode> GetEpisodes(int season, TvdbEpisode.EpisodeOrdering order)
-    {
-      List<TvdbEpisode> episodes = new List<TvdbEpisode>();
-      _episodes.ForEach(delegate(TvdbEpisode e) { if (e.SeasonNumber == season) episodes.Add(e); });
-
-      switch (order)
-      {
-        case TvdbEpisode.EpisodeOrdering.DefaultOrder:
-          episodes.Sort(new EpisodeComparerAired());
-          break;
-        case TvdbEpisode.EpisodeOrdering.DvdOrder:
-          episodes.Sort(new EpisodeComparerDvd());
-          break;
-        case TvdbEpisode.EpisodeOrdering.AbsoluteOrder:
-          episodes.Sort(new EpisodeComparerAbsolute());
-          break;
-      }
-      return episodes;
-    }
-
-    /// <summary>
-    /// Returns all episodes in the absolute order
-    /// </summary>
-    /// <returns>List of episodes</returns>
-    public List<TvdbEpisode> GetEpisodesAbsoluteOrder()
-    {
-      List<TvdbEpisode> episodes = new List<TvdbEpisode>();
-      _episodes.ForEach(episodes.Add);
-      episodes.Sort(new EpisodeComparerAbsolute());
-      return episodes;
     }
 
     /// <summary>
@@ -341,6 +295,54 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data
     {
       get { return _actors; }
       set { _actors = value; }
+    }
+
+    /// <summary>
+    /// Returns a short description of the episode (e.g. 1x20 Episodename)
+    /// </summary>
+    /// <returns>short description of the episode</returns>
+    public override string ToString()
+    {
+      return _seriesName + "[" + _language.Abbriviation + "]";
+    }
+
+    /// <summary>
+    /// <para>Gets the episodes for the given Season in the given order (aired or dvd). Absolute is also possible but makes no sense since
+    /// there are no seasons with absoulte ordering. Use GetEpisodesAbsoluteOrder() instead.</para>
+    /// 
+    /// <para>For more information on episode ordering <see href="http://thetvdb.com/wiki/index.php/Category:Episodes">thetvdb wiki</see></para>
+    /// </summary>
+    /// <returns>List of episodes</returns>
+    public List<TvdbEpisode> GetEpisodes(int season, TvdbEpisode.EpisodeOrdering order)
+    {
+      List<TvdbEpisode> episodes = new List<TvdbEpisode>();
+      _episodes.ForEach(delegate(TvdbEpisode e) { if (e.SeasonNumber == season) episodes.Add(e); });
+
+      switch (order)
+      {
+        case TvdbEpisode.EpisodeOrdering.DefaultOrder:
+          episodes.Sort(new EpisodeComparerAired());
+          break;
+        case TvdbEpisode.EpisodeOrdering.DvdOrder:
+          episodes.Sort(new EpisodeComparerDvd());
+          break;
+        case TvdbEpisode.EpisodeOrdering.AbsoluteOrder:
+          episodes.Sort(new EpisodeComparerAbsolute());
+          break;
+      }
+      return episodes;
+    }
+
+    /// <summary>
+    /// Returns all episodes in the absolute order
+    /// </summary>
+    /// <returns>List of episodes</returns>
+    public List<TvdbEpisode> GetEpisodesAbsoluteOrder()
+    {
+      List<TvdbEpisode> episodes = new List<TvdbEpisode>();
+      _episodes.ForEach(episodes.Add);
+      episodes.Sort(new EpisodeComparerAbsolute());
+      return episodes;
     }
 
     /// <summary>

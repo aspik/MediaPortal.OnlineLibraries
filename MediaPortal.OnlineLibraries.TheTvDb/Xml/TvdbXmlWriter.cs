@@ -20,10 +20,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.IO;
-using System.Xml.Linq;
 using System.Drawing;
+using System.IO;
+using System.Text;
+using System.Xml.Linq;
 using MediaPortal.OnlineLibraries.TheTvDb.Data;
 using MediaPortal.OnlineLibraries.TheTvDb.Data.Banner;
 
@@ -37,10 +37,7 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Xml
     /// <summary>
     /// TvdbXmlWriter constructor
     /// </summary>
-    internal TvdbXmlWriter()
-    {
-
-    }
+    internal TvdbXmlWriter() {}
 
     /// <summary>
     /// Create the file contents
@@ -53,10 +50,10 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Xml
       foreach (TvdbLanguage l in languages)
       {
         xml.Add(new XElement("Language",
-                   new XElement("name", l.Name),
-                   new XElement("abbreviation", l.Abbriviation),
-                   new XElement("id", l.Id))
-               );
+                             new XElement("name", l.Name),
+                             new XElement("abbreviation", l.Abbriviation),
+                             new XElement("id", l.Id))
+          );
       }
       return xml.ToString();
     }
@@ -95,10 +92,10 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Xml
       foreach (TvdbMirror m in mirrors)
       {
         xml.Add(new XElement("Mirror",
-                   new XElement("id", m.Id),
-                   new XElement("mirrorpath", m.MirrorPath),
-                   new XElement("typemask", m.TypeMask))
-               );
+                             new XElement("id", m.Id),
+                             new XElement("mirrorpath", m.MirrorPath),
+                             new XElement("typemask", m.TypeMask))
+          );
       }
       return xml.ToString();
     }
@@ -137,12 +134,12 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Xml
       foreach (TvdbActor m in actors)
       {
         xml.Add(new XElement("Actor",
-                   new XElement("id", m.Id),
-                   new XElement("Image", m.ActorImage.BannerPath),
-                   new XElement("Role", m.Role),
-                   new XElement("SortOrder", m.SortOrder),
-                   new XElement("Name", m.Name))
-               );
+                             new XElement("id", m.Id),
+                             new XElement("Image", m.ActorImage.BannerPath),
+                             new XElement("Role", m.Role),
+                             new XElement("SortOrder", m.SortOrder),
+                             new XElement("Name", m.Name))
+          );
       }
       return xml.ToString();
     }
@@ -179,28 +176,28 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Xml
       XElement xml = new XElement("Data");
 
       xml.Add(new XElement("Series",
-                  new XElement("id", series.Id),
-                  new XElement("Actors", series.ActorsString),
-                  new XElement("Airs_DayOfWeek", series.AirsDayOfWeek),
-                  new XElement("Airs_Time", series.AirsTime),
-                  new XElement("ContentRating", series.ContentRating),
-                  new XElement("FirstAired", series.FirstAired),
-                  new XElement("Genre", series.GenreString),
-                  new XElement("IMDB_ID", series.ImdbId),
-                  new XElement("Language", series.Language.Abbriviation),
-                  new XElement("Network", series.Network),
-                  new XElement("Overview", series.Overview),
-                  new XElement("Rating", series.Rating),
-                  new XElement("Runtime", series.Runtime),
-                  new XElement("SeriesID", series.TvDotComId),
-                  new XElement("SeriesName", series.SeriesName),
-                  new XElement("Status", series.Status),
-                  new XElement("banner", series.BannerPath ?? ""),
-                  new XElement("fanart", series.FanartPath ?? ""),
-                  new XElement("Poster", series.PosterPath ?? ""),
-                  new XElement("lastupdated", Util.DotNetToUnix(series.LastUpdated)),
-                  new XElement("zap2it_id", series.Zap2itId))
-             );
+                           new XElement("id", series.Id),
+                           new XElement("Actors", series.ActorsString),
+                           new XElement("Airs_DayOfWeek", series.AirsDayOfWeek),
+                           new XElement("Airs_Time", series.AirsTime),
+                           new XElement("ContentRating", series.ContentRating),
+                           new XElement("FirstAired", series.FirstAired),
+                           new XElement("Genre", series.GenreString),
+                           new XElement("IMDB_ID", series.ImdbId),
+                           new XElement("Language", series.Language.Abbriviation),
+                           new XElement("Network", series.Network),
+                           new XElement("Overview", series.Overview),
+                           new XElement("Rating", series.Rating),
+                           new XElement("Runtime", series.Runtime),
+                           new XElement("SeriesID", series.TvDotComId),
+                           new XElement("SeriesName", series.SeriesName),
+                           new XElement("Status", series.Status),
+                           new XElement("banner", series.BannerPath ?? ""),
+                           new XElement("fanart", series.FanartPath ?? ""),
+                           new XElement("Poster", series.PosterPath ?? ""),
+                           new XElement("lastupdated", Util.DotNetToUnix(series.LastUpdated)),
+                           new XElement("zap2it_id", series.Zap2itId))
+        );
 
 
       if (series.Episodes != null && series.EpisodesLoaded)
@@ -208,35 +205,38 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Xml
         foreach (TvdbEpisode e in series.Episodes)
         {
           xml.Add(new XElement("Episode",
-                  new XElement("id", e.Id),
-                  new XElement("Combined_episodenumber", e.CombinedEpisodeNumber),
-                  new XElement("Combined_season", e.CombinedSeason),
-                  new XElement("DVD_chapter", e.DvdChapter != Util.NO_VALUE ? e.DvdChapter.ToString() : ""),
-                  new XElement("DVD_discid", e.DvdDiscId != Util.NO_VALUE ? e.DvdDiscId.ToString() : ""),
-                  new XElement("DVD_episodenumber", e.DvdEpisodeNumber != Util.NO_VALUE ? e.DvdEpisodeNumber.ToString() : ""),
-                  new XElement("DVD_season", e.DvdSeason != Util.NO_VALUE ? e.DvdSeason.ToString() : ""),
-                  new XElement("Director", e.DirectorsString),
-                  new XElement("EpisodeName", e.EpisodeName),
-                  new XElement("EpisodeNumber", e.EpisodeNumber),
-                  new XElement("FirstAired", e.FirstAired),
-                  new XElement("GuestStars", e.GuestStarsString),
-                  new XElement("IMDB_ID", e.ImdbId),
-                  new XElement("Language", e.Language.Abbriviation),
-                  new XElement("Overview", e.Overview),
-                  new XElement("ProductionCode", e.ProductionCode),
-                  new XElement("Rating", e.Rating.ToString()),
-                  new XElement("SeasonNumber", e.SeasonNumber),
-                  new XElement("Writer", e.WriterString),
-                  new XElement("absolute_number", e.AbsoluteNumber),
-                  new XElement("airsafter_season", e.AirsAfterSeason != Util.NO_VALUE ? e.AirsAfterSeason.ToString() : ""),
-                  new XElement("airsbefore_episode", e.AirsBeforeEpisode != Util.NO_VALUE ? e.AirsBeforeEpisode.ToString() : ""),
-                  new XElement("airsbefore_season", e.AirsBeforeSeason != Util.NO_VALUE ? e.AirsBeforeSeason.ToString() : ""),
-                  new XElement("filename", e.BannerPath),
-                  new XElement("lastupdated", Util.DotNetToUnix(e.LastUpdated)),
-                  new XElement("seasonid", e.SeasonId),
-                  new XElement("seriesid", e.SeriesId))
-                 );
-
+                               new XElement("id", e.Id),
+                               new XElement("Combined_episodenumber", e.CombinedEpisodeNumber),
+                               new XElement("Combined_season", e.CombinedSeason),
+                               new XElement("DVD_chapter", e.DvdChapter != Util.NO_VALUE ? e.DvdChapter.ToString() : ""),
+                               new XElement("DVD_discid", e.DvdDiscId != Util.NO_VALUE ? e.DvdDiscId.ToString() : ""),
+                               new XElement("DVD_episodenumber",
+                                            e.DvdEpisodeNumber != Util.NO_VALUE ? e.DvdEpisodeNumber.ToString() : ""),
+                               new XElement("DVD_season", e.DvdSeason != Util.NO_VALUE ? e.DvdSeason.ToString() : ""),
+                               new XElement("Director", e.DirectorsString),
+                               new XElement("EpisodeName", e.EpisodeName),
+                               new XElement("EpisodeNumber", e.EpisodeNumber),
+                               new XElement("FirstAired", e.FirstAired),
+                               new XElement("GuestStars", e.GuestStarsString),
+                               new XElement("IMDB_ID", e.ImdbId),
+                               new XElement("Language", e.Language.Abbriviation),
+                               new XElement("Overview", e.Overview),
+                               new XElement("ProductionCode", e.ProductionCode),
+                               new XElement("Rating", e.Rating.ToString()),
+                               new XElement("SeasonNumber", e.SeasonNumber),
+                               new XElement("Writer", e.WriterString),
+                               new XElement("absolute_number", e.AbsoluteNumber),
+                               new XElement("airsafter_season",
+                                            e.AirsAfterSeason != Util.NO_VALUE ? e.AirsAfterSeason.ToString() : ""),
+                               new XElement("airsbefore_episode",
+                                            e.AirsBeforeEpisode != Util.NO_VALUE ? e.AirsBeforeEpisode.ToString() : ""),
+                               new XElement("airsbefore_season",
+                                            e.AirsBeforeSeason != Util.NO_VALUE ? e.AirsBeforeSeason.ToString() : ""),
+                               new XElement("filename", e.BannerPath),
+                               new XElement("lastupdated", Util.DotNetToUnix(e.LastUpdated)),
+                               new XElement("seasonid", e.SeasonId),
+                               new XElement("seriesid", e.SeriesId))
+            );
         }
       }
       return xml.ToString();
@@ -281,14 +281,14 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Xml
         banner.Add(new XElement("LastUpdated", Util.DotNetToUnix(b.LastUpdated)));
         if (b.GetType() == typeof(TvdbSeriesBanner))
         {
-          TvdbSeriesBanner sb = (TvdbSeriesBanner)b;
+          TvdbSeriesBanner sb = (TvdbSeriesBanner) b;
           banner.Add(new XElement("BannerType", "series"));
           banner.Add(new XElement("BannerType2", sb.BannerType));
           banner.Add(new XElement("Language", (sb.Language != null ? sb.Language.Abbriviation : "")));
         }
         else if (b.GetType() == typeof(TvdbFanartBanner))
         {
-          TvdbFanartBanner fb = (TvdbFanartBanner)b;
+          TvdbFanartBanner fb = (TvdbFanartBanner) b;
           banner.Add(new XElement("BannerType", "fanart"));
           banner.Add(new XElement("BannerType2", fb.Resolution.X + "x" + fb.Resolution.Y));
           if (fb.Colors != null && fb.Colors.Count == 0)
@@ -317,7 +317,7 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Xml
         }
         else if (b.GetType() == typeof(TvdbSeasonBanner))
         {
-          TvdbSeasonBanner sb = (TvdbSeasonBanner)b;
+          TvdbSeasonBanner sb = (TvdbSeasonBanner) b;
           banner.Add(new XElement("BannerType", "season"));
           banner.Add(new XElement("BannerType2", sb.BannerType));
           banner.Add(new XElement("Language", (sb.Language != null ? sb.Language.Abbriviation : "")));
@@ -325,7 +325,7 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Xml
         }
         else if (b.GetType() == typeof(TvdbPosterBanner))
         {
-          TvdbPosterBanner pb = (TvdbPosterBanner)b;
+          TvdbPosterBanner pb = (TvdbPosterBanner) b;
           banner.Add(new XElement("BannerType", "Poster"));
           banner.Add(new XElement("BannerType2", pb.Resolution.X + "x" + pb.Resolution.Y));
           banner.Add(new XElement("Language", (pb.Language != null ? pb.Language.Abbriviation : "")));
@@ -391,11 +391,11 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Xml
       }
 
       xml.Add(new XElement("User",
-                  new XElement("Name", user.UserName),
-                  new XElement("Identifier", user.UserIdentifier),
-                  new XElement("Favorites", favBuilder.ToString()),
-                  preferred
-             ));
+                           new XElement("Name", user.UserName),
+                           new XElement("Identifier", user.UserIdentifier),
+                           new XElement("Favorites", favBuilder.ToString()),
+                           preferred
+                ));
 
       return xml.ToString();
     }

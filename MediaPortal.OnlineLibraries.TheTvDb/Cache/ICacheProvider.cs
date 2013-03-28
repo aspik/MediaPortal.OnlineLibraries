@@ -153,7 +153,8 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Cache
     /// <param name="checkBannersLoaded">are banners loaded</param>
     /// <param name="checkActorsLoaded">are actors loaded</param>
     /// <returns>true if the series is cached, false otherwise</returns>
-    bool IsCached(int seriesId, TvdbLanguage lang, bool checkEpisodesLoaded, bool checkBannersLoaded, bool checkActorsLoaded);
+    bool IsCached(int seriesId, TvdbLanguage lang, bool checkEpisodesLoaded, bool checkBannersLoaded,
+                  bool checkActorsLoaded);
 
     /// <summary>
     /// Removes the specified image from cache (if it has been cached)

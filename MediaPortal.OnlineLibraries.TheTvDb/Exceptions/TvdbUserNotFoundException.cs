@@ -31,8 +31,6 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Exceptions
     /// TvdbUserNotFoundException constructor
     /// </summary>
     /// <param name="text">Message</param>
-    public TvdbUserNotFoundException(String text): base(text)
-    {
-    }
+    public TvdbUserNotFoundException(String text) : base(text) {}
   }
 }

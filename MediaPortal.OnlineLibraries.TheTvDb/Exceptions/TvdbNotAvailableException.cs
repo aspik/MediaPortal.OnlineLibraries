@@ -32,16 +32,12 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Exceptions
     /// </summary>
     /// <param name="text">Message</param>
     public TvdbNotAvailableException(String text)
-      : base(text)
-    {
-    }
+      : base(text) {}
 
     /// <summary>
     /// TvdbNotAvailableException constructor
     /// </summary>
     public TvdbNotAvailableException()
-      : base()
-    {
-    }
+      : base() {}
   }
 }

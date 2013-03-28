@@ -30,7 +30,7 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data.Banner
   /// further information on http://thetvdb.com/wiki/index.php/Episode_Images
   /// </summary>
   [Serializable]
-  public class TvdbEpisodeBanner: TvdbBannerWithThumb
+  public class TvdbEpisodeBanner : TvdbBannerWithThumb
   {
     /// <summary>
     /// TvdbEpisodeBanner constructor
@@ -45,7 +45,7 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data.Banner
     /// </summary>
     /// <param name="bannerPath">Path of banner</param>
     /// <param name="id">Id of episode banner</param>
-    public TvdbEpisodeBanner(int id, String bannerPath):this()
+    public TvdbEpisodeBanner(int id, String bannerPath) : this()
     {
       Id = id;
       BannerPath = bannerPath;

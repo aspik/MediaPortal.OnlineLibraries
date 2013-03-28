@@ -54,10 +54,7 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data
     /// TvdbLanguage constructor
     /// </summary>
     public TvdbLanguage()
-      : this(Util.NO_VALUE, "", "")
-    {
-
-    }
+      : this(Util.NO_VALUE, "", "") {}
 
     /// <summary>
     /// TvdbLanguage constructor
@@ -106,7 +103,7 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data
     public override bool Equals(object compare)
     {
       if (compare != null && compare.GetType() == typeof(TvdbLanguage) &&
-          Abbriviation.Equals(((TvdbLanguage)compare).Abbriviation))
+          Abbriviation.Equals(((TvdbLanguage) compare).Abbriviation))
       {
         return true;
       }
@@ -122,7 +119,7 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data
     /// <returns>True if the two language objects are the same, false otherwise</returns>
     public static bool operator ==(TvdbLanguage a, TvdbLanguage b)
     {
-      if (((object)a) == null || ((object)b) == null) return false;
+      if (((object) a) == null || ((object) b) == null) return false;
       if (a.Abbriviation.Equals(b.Abbriviation)) return true;
       return false;
     }
@@ -136,8 +133,8 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data
     /// <returns>True if the two language objects are the same, false otherwise</returns>
     public static bool operator !=(TvdbLanguage a, TvdbLanguage b)
     {
-      if (((object)a) == null && ((object)b) == null) return false;
-      if (((object)a) == null || ((object)b) == null) return true;
+      if (((object) a) == null && ((object) b) == null) return false;
+      if (((object) a) == null || ((object) b) == null) return true;
 
       if (!a.Abbriviation.Equals(b.Abbriviation)) return true;
       return false;

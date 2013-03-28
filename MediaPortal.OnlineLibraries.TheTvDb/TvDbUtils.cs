@@ -20,14 +20,13 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Globalization;
+using System.Linq;
 using MediaPortal.OnlineLibraries.TheTvDb.Data;
 using MediaPortal.OnlineLibraries.TheTvDb.Data.Banner;
 
 namespace MediaPortal.OnlineLibraries.TheTvDb
 {
- 
   internal class TvDbUtils
   {
     #region private fields
@@ -106,19 +105,21 @@ namespace MediaPortal.OnlineLibraries.TheTvDb
       for (int i = 0; i < series.Episodes.Count; i++)
       {
         if (series.Episodes[i].Id == episode.Id)
-        {//we have already stored this episode -> overwrite it
+        {
+          //we have already stored this episode -> overwrite it
           series.Episodes[i].UpdateEpisodeInfo(episode);
           episodeFound = true;
           break;
         }
       }
       if (!episodeFound)
-      {//the episode doesn't exist yet
+      {
+        //the episode doesn't exist yet
         series.Episodes.Add(episode);
         if (!series.EpisodesLoaded) series.EpisodesLoaded = true;
       }
     }
-    
+
     /// <summary>
     /// Tries to find an episode by a given id from a list of episodes
     /// </summary>

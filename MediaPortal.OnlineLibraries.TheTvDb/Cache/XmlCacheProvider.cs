@@ -20,9 +20,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.IO;
 using System.Drawing;
+using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using MediaPortal.OnlineLibraries.TheTvDb.Data;
@@ -38,9 +38,9 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Cache
   {
     #region private fields
 
-    readonly TvdbXmlWriter _xmlWriter;
-    readonly TvdbXmlReader _xmlReader;
-    readonly String _rootFolder;
+    private readonly String _rootFolder;
+    private readonly TvdbXmlReader _xmlReader;
+    private readonly TvdbXmlWriter _xmlWriter;
 
     #endregion
 
@@ -54,15 +54,6 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Cache
       _xmlWriter = new TvdbXmlWriter();
       _xmlReader = new TvdbXmlReader();
       _rootFolder = rootFolder;
-    }
-
-    /// <summary>
-    /// Properly describe the CacheProvider for neat-reasons
-    /// </summary>
-    /// <returns>String describing the cache provider</returns>
-    public override string ToString()
-    {
-      return "XmlCacheProvider (" + _rootFolder + ")";
     }
 
     #region ICacheProvider Members
@@ -91,7 +82,7 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Cache
         if (data == null)
         {
           //the cache has never been initialised before -> do it now
-          data = new TvdbData { LanguageList = new List<TvdbLanguage>(), LastUpdated = DateTime.Now };
+          data = new TvdbData {LanguageList = new List<TvdbLanguage>(), LastUpdated = DateTime.Now};
           SaveToCache(data);
         }
         Initialised = true;
@@ -142,20 +133,6 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Cache
       {
         if (!Directory.Exists(_rootFolder)) Directory.CreateDirectory(_rootFolder);
         _xmlWriter.WriteLanguageFile(languageList, _rootFolder + Path.DirectorySeparatorChar + "languages.xml");
-      }
-    }
-
-    /// <summary>
-    /// Save the mirror info to cache
-    /// </summary>
-    /// <param name="mirrorInfo">Mirrors</param>
-    [Obsolete("Not used any more, however if won't delete the class since it could be useful at some point")]
-    public void SaveToCache(List<TvdbMirror> mirrorInfo)
-    {
-      if (mirrorInfo != null && mirrorInfo.Count > 0)
-      {
-        if (!Directory.Exists(_rootFolder)) Directory.CreateDirectory(_rootFolder);
-        _xmlWriter.WriteMirrorFile(mirrorInfo, _rootFolder + Path.DirectorySeparatorChar + "mirrors.xml");
       }
     }
 
@@ -217,9 +194,9 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Cache
 
         var info = from dataNode in xml.Descendants("Data")
                    select new
-                   {
-                     lu = dataNode.Element("LastUpdated").Value
-                   };
+                     {
+                       lu = dataNode.Element("LastUpdated").Value
+                     };
         if (info.Count() == 1)
         {
           TvdbData data = new TvdbData();
@@ -237,11 +214,9 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Cache
           //if (data.SeriesList == null) data.SeriesList = new List<TvdbSeries>();
           return data;
         }
-
       }
 
       return null;
-
     }
 
     /// <summary>
@@ -252,17 +227,6 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Cache
     {
       String file = _rootFolder + Path.DirectorySeparatorChar + "languages.xml";
       return File.Exists(file) ? _xmlReader.ExtractLanguages(File.ReadAllText(file)) : null;
-    }
-
-    /// <summary>
-    /// Load the available mirrors from cache
-    /// </summary>
-    /// <returns>List of mirrors</returns>
-    [Obsolete("Not used any more, however if won't delete the class since it could be useful at some point")]
-    public List<TvdbMirror> LoadMirrorListFromCache()
-    {
-      String file = _rootFolder + Path.DirectorySeparatorChar + "mirrors.xml";
-      return File.Exists(file) ? _xmlReader.ExtractMirrors(File.ReadAllText(file)) : null;
     }
 
     /// <summary>
@@ -288,7 +252,6 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Cache
     }
 
 
-
     /// <summary>
     /// Load the give series from cache
     /// </summary>
@@ -301,6 +264,7 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Cache
       TvdbSeries series = new TvdbSeries();
 
       #region load series in all available languages
+
       String[] seriesLanguages = Directory.GetFiles(seriesRoot, "*.xml");
       foreach (String l in seriesLanguages)
       {
@@ -336,7 +300,8 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Cache
       }
 
       if (!series.BannerPath.Equals(""))
-        series.Banners.Add(new TvdbSeriesBanner(series.Id, series.BannerPath, series.Language, TvdbSeriesBanner.Type.Graphical));
+        series.Banners.Add(new TvdbSeriesBanner(series.Id, series.BannerPath, series.Language,
+                                                TvdbSeriesBanner.Type.Graphical));
 
       if (!series.PosterPath.Equals(""))
         series.Banners.Add(new TvdbPosterBanner(series.Id, series.PosterPath, series.Language));
@@ -347,7 +312,8 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Cache
       Regex rex = new Regex("S(\\d+)E(\\d+)");
       if (Directory.Exists(seriesRoot + Path.DirectorySeparatorChar + "EpisodeImages"))
       {
-        String[] episodeFiles = Directory.GetFiles(seriesRoot + Path.DirectorySeparatorChar + "EpisodeImages", "ep_*.jpg");
+        String[] episodeFiles = Directory.GetFiles(seriesRoot + Path.DirectorySeparatorChar + "EpisodeImages",
+                                                   "ep_*.jpg");
         foreach (String epImageFile in episodeFiles)
         {
           try
@@ -355,7 +321,8 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Cache
             Match match = rex.Match(epImageFile);
             int season = Int32.Parse(match.Groups[1].Value);
             int episode = Int32.Parse(match.Groups[2].Value);
-            foreach (TvdbEpisode e in series.Episodes.Where(e => e.SeasonNumber == season && e.EpisodeNumber == episode))
+            foreach (TvdbEpisode e in series.Episodes.Where(e => e.SeasonNumber == season && e.EpisodeNumber == episode)
+              )
             {
               if (epImageFile.Contains("thumb"))
                 e.Banner.LoadThumb(Image.FromFile(epImageFile));
@@ -374,6 +341,7 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Cache
       #endregion
 
       #region Banner loading
+
       String bannerFile = seriesRoot + Path.DirectorySeparatorChar + "banners.xml";
       //load cached banners
       if (File.Exists(bannerFile))
@@ -390,9 +358,9 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Cache
             foreach (TvdbBanner banner in bannerList.Where(banner => banner.Id == bannerId))
             {
               if (b.Contains("thumb") && banner.GetType().BaseType == typeof(TvdbBannerWithThumb))
-                ((TvdbBannerWithThumb)banner).LoadThumb(Image.FromFile(b));
+                ((TvdbBannerWithThumb) banner).LoadThumb(Image.FromFile(b));
               else if (b.Contains("vignette") && banner.GetType() == typeof(TvdbFanartBanner))
-                ((TvdbFanartBanner)banner).LoadVignette(Image.FromFile(b));
+                ((TvdbFanartBanner) banner).LoadVignette(Image.FromFile(b));
               else
                 banner.LoadBanner(Image.FromFile(b));
             }
@@ -404,9 +372,11 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Cache
         }
         series.Banners = bannerList;
       }
+
       #endregion
 
       #region actor loading
+
       //load actor info
       String actorFile = seriesRoot + Path.DirectorySeparatorChar + "actors.xml";
       if (File.Exists(actorFile))
@@ -429,10 +399,10 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Cache
         }
         series.TvdbActors = actorList;
       }
+
       #endregion
 
       return series;
-
     }
 
     /// <summary>
@@ -525,8 +495,8 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Cache
         actorsLoaded = true;
 
       return episodesLoaded || !checkEpisodesLoaded &&
-             bannersLoaded || !checkBannersLoaded &&
-             actorsLoaded || !checkActorsLoaded;
+                               bannersLoaded || !checkBannersLoaded &&
+                                                actorsLoaded || !checkActorsLoaded;
     }
 
     /// <summary>
@@ -629,7 +599,8 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Cache
       }
       else
       {
-        Log.Warn("Couldn't save image " + fileName + " for series " + seriesId + " because the series directory doesn't exist yet");
+        Log.Warn("Couldn't save image " + fileName + " for series " + seriesId +
+                 " because the series directory doesn't exist yet");
       }
     }
 
@@ -692,5 +663,39 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Cache
     }
 
     #endregion
+
+    /// <summary>
+    /// Properly describe the CacheProvider for neat-reasons
+    /// </summary>
+    /// <returns>String describing the cache provider</returns>
+    public override string ToString()
+    {
+      return "XmlCacheProvider (" + _rootFolder + ")";
+    }
+
+    /// <summary>
+    /// Save the mirror info to cache
+    /// </summary>
+    /// <param name="mirrorInfo">Mirrors</param>
+    [Obsolete("Not used any more, however if won't delete the class since it could be useful at some point")]
+    public void SaveToCache(List<TvdbMirror> mirrorInfo)
+    {
+      if (mirrorInfo != null && mirrorInfo.Count > 0)
+      {
+        if (!Directory.Exists(_rootFolder)) Directory.CreateDirectory(_rootFolder);
+        _xmlWriter.WriteMirrorFile(mirrorInfo, _rootFolder + Path.DirectorySeparatorChar + "mirrors.xml");
+      }
+    }
+
+    /// <summary>
+    /// Load the available mirrors from cache
+    /// </summary>
+    /// <returns>List of mirrors</returns>
+    [Obsolete("Not used any more, however if won't delete the class since it could be useful at some point")]
+    public List<TvdbMirror> LoadMirrorListFromCache()
+    {
+      String file = _rootFolder + Path.DirectorySeparatorChar + "mirrors.xml";
+      return File.Exists(file) ? _xmlReader.ExtractMirrors(File.ReadAllText(file)) : null;
+    }
   }
 }

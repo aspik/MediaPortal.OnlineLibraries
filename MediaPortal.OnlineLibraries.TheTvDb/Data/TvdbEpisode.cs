@@ -62,10 +62,11 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data
   [Serializable]
   public class TvdbEpisode
   {
-
     #region private fields
 
     #endregion
+
+    #region EpisodeOrdering enum
 
     /// <summary>
     /// While one would think that the episode number would be a simple affair there are several different ways that someone might choose to number the episodes on this site episodes are numbered in the order they aired on TV. That being said the site does provide two alternative numbering methods. <br /> <br />
@@ -92,13 +93,78 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data
       AbsoluteOrder = 2
     }
 
+    #endregion
+
     /// <summary>
     /// Default constructor for the TvdbEpisode class
     /// </summary>
-    public TvdbEpisode()
-    {
+    public TvdbEpisode() {}
 
+    /// <summary>
+    /// Formatted String of writers for this episode in the 
+    /// format | writer1 | writer2 | writer3 |
+    /// </summary>
+    public String WriterString
+    {
+      get
+      {
+        if (Writer == null || Writer.Count == 0) return "";
+        StringBuilder retString = new StringBuilder();
+        retString.Append("|");
+        foreach (String s in Writer)
+        {
+          retString.Append(s);
+          retString.Append("|");
+        }
+        return retString.ToString();
+      }
     }
+
+    /// <summary>
+    /// Formatted String of guest stars that appeared during this episode in the 
+    /// format | gueststar1 | gueststar2 | gueststar3 |
+    /// </summary>
+    public String GuestStarsString
+    {
+      get
+      {
+        if (GuestStars == null || GuestStars.Count == 0) return "";
+        StringBuilder retString = new StringBuilder();
+        retString.Append("|");
+        foreach (String s in GuestStars)
+        {
+          retString.Append(s);
+          retString.Append("|");
+        }
+        return retString.ToString();
+      }
+    }
+
+
+    /// <summary>
+    /// Formatted String of directors of this episode in the 
+    /// format | director1 | director2 | director3 |
+    /// </summary>
+    public String DirectorsString
+    {
+      get
+      {
+        if (Directors == null || Directors.Count == 0) return "";
+        StringBuilder retString = new StringBuilder();
+        retString.Append("|");
+        foreach (String s in Directors)
+        {
+          retString.Append(s);
+          retString.Append("|");
+        }
+        return retString.ToString();
+      }
+    }
+
+    /// <summary>
+    /// The episode image banner
+    /// </summary>
+    public TvdbEpisodeBanner Banner { get; set; }
 
     /// <summary>
     /// Returns a short description of the episode (e.g. 1x20 Episodename)
@@ -107,6 +173,38 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data
     public override String ToString()
     {
       return SeasonNumber + "x" + EpisodeNumber + (EpisodeName != null ? " " + EpisodeName : "");
+    }
+
+    /// <summary>
+    /// Updates all information of this episode from the given
+    /// episode...
+    /// </summary>
+    /// <param name="episode">new episode</param>
+    internal void UpdateEpisodeInfo(TvdbEpisode episode)
+    {
+      LastUpdated = episode.LastUpdated;
+      BannerPath = episode.BannerPath;
+      Banner = episode.Banner;
+      AbsoluteNumber = episode.AbsoluteNumber;
+      CombinedEpisodeNumber = episode.CombinedEpisodeNumber;
+      CombinedSeason = episode.CombinedSeason;
+      Directors = episode.Directors;
+      DvdChapter = episode.DvdChapter;
+      DvdDiscId = episode.DvdDiscId;
+      DvdEpisodeNumber = episode.DvdEpisodeNumber;
+      DvdSeason = episode.DvdSeason;
+      EpisodeName = episode.EpisodeName;
+      EpisodeNumber = episode.EpisodeNumber;
+      FirstAired = episode.FirstAired;
+      GuestStars = episode.GuestStars;
+      ImdbId = episode.ImdbId;
+      Language = episode.Language;
+      Overview = episode.Overview;
+      ProductionCode = episode.ProductionCode;
+      Rating = episode.Rating;
+      SeasonId = episode.SeasonId;
+      SeasonNumber = episode.SeasonNumber;
+      Writer = episode.Writer;
     }
 
     #region specials
@@ -136,10 +234,7 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data
     /// </summary>
     public bool IsSpecial
     {
-      get
-      {
-        return (SeasonNumber == 0);
-      }
+      get { return (SeasonNumber == 0); }
     }
 
     #endregion
@@ -272,105 +367,5 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data
     public double CombinedEpisodeNumber { get; set; }
 
     #endregion
-
-
-    /// <summary>
-    /// Formatted String of writers for this episode in the 
-    /// format | writer1 | writer2 | writer3 |
-    /// </summary>
-    public String WriterString
-    {
-      get
-      {
-        if (Writer == null || Writer.Count == 0) return "";
-        StringBuilder retString = new StringBuilder();
-        retString.Append("|");
-        foreach (String s in Writer)
-        {
-          retString.Append(s);
-          retString.Append("|");
-        }
-        return retString.ToString();
-      }
-    }
-
-    /// <summary>
-    /// Formatted String of guest stars that appeared during this episode in the 
-    /// format | gueststar1 | gueststar2 | gueststar3 |
-    /// </summary>
-    public String GuestStarsString
-    {
-      get
-      {
-        if (GuestStars == null || GuestStars.Count == 0) return "";
-        StringBuilder retString = new StringBuilder();
-        retString.Append("|");
-        foreach (String s in GuestStars)
-        {
-          retString.Append(s);
-          retString.Append("|");
-        }
-        return retString.ToString();
-      }
-    }
-
-
-
-    /// <summary>
-    /// Formatted String of directors of this episode in the 
-    /// format | director1 | director2 | director3 |
-    /// </summary>
-    public String DirectorsString
-    {
-      get
-      {
-        if (Directors == null || Directors.Count == 0) return "";
-        StringBuilder retString = new StringBuilder();
-        retString.Append("|");
-        foreach (String s in Directors)
-        {
-          retString.Append(s);
-          retString.Append("|");
-        }
-        return retString.ToString();
-      }
-    }
-
-    /// <summary>
-    /// The episode image banner
-    /// </summary>
-    public TvdbEpisodeBanner Banner { get; set; }
-
-    /// <summary>
-    /// Updates all information of this episode from the given
-    /// episode...
-    /// </summary>
-    /// <param name="episode">new episode</param>
-    internal void UpdateEpisodeInfo(TvdbEpisode episode)
-    {
-      LastUpdated = episode.LastUpdated;
-      BannerPath = episode.BannerPath;
-      Banner = episode.Banner;
-      AbsoluteNumber = episode.AbsoluteNumber;
-      CombinedEpisodeNumber = episode.CombinedEpisodeNumber;
-      CombinedSeason = episode.CombinedSeason;
-      Directors = episode.Directors;
-      DvdChapter = episode.DvdChapter;
-      DvdDiscId = episode.DvdDiscId;
-      DvdEpisodeNumber = episode.DvdEpisodeNumber;
-      DvdSeason = episode.DvdSeason;
-      EpisodeName = episode.EpisodeName;
-      EpisodeNumber = episode.EpisodeNumber;
-      FirstAired = episode.FirstAired;
-      GuestStars = episode.GuestStars;
-      ImdbId = episode.ImdbId;
-      Language = episode.Language;
-      Overview = episode.Overview;
-      ProductionCode = episode.ProductionCode;
-      Rating = episode.Rating;
-      SeasonId = episode.SeasonId;
-      SeasonNumber = episode.SeasonNumber;
-      Writer = episode.Writer;
-    }
   }
 }

@@ -141,7 +141,8 @@ namespace MediaPortal.OnlineLibraries.TheTvDb
 
     internal static String CreateSearchLink(String searchString, TvdbLanguage language)
     {
-      String link = String.Format("{0}/api/GetSeries.php?seriesname={1}&language={2}", BASE_SERVER.Trim('/'), HttpUtility.UrlEncode(searchString), language.Abbriviation);
+      String link = String.Format("{0}/api/GetSeries.php?seriesname={1}&language={2}", BASE_SERVER.Trim('/'),
+                                  HttpUtility.UrlEncode(searchString), language.Abbriviation);
       return link;
     }
 
@@ -163,7 +164,6 @@ namespace MediaPortal.OnlineLibraries.TheTvDb
 
       String link = BASE_SERVER + "/banners/" + bannerPath;
       return link;
-
     }
 
     internal static string CreateLanguageLink(string apiKey)
@@ -189,10 +189,13 @@ namespace MediaPortal.OnlineLibraries.TheTvDb
     internal static String CreateUserFavouriteLink(String identifier, Util.UserFavouriteAction type, int seriesId)
     {
       String link = String.Format("{0}/api/User_Favorites.php?accountid={1}{2}", BASE_SERVER.Trim('/'), identifier,
-                                  ((type == Util.UserFavouriteAction.None) ? "" : ("&type=" + type +
-                                  "&seriesid=" + seriesId)));
+                                  ((type == Util.UserFavouriteAction.None)
+                                     ? ""
+                                     : ("&type=" + type +
+                                        "&seriesid=" + seriesId)));
       return link;
     }
+
     /// <summary>
     /// Creates link which only retrieves the user favourites
     /// </summary>
@@ -202,36 +205,6 @@ namespace MediaPortal.OnlineLibraries.TheTvDb
     {
       return CreateUserFavouriteLink(identifier, Util.UserFavouriteAction.None, 0);
     }
-
-    #region Rating
-
-    private static String CreateBasicRating(String identifier)
-    {
-      String link = String.Format("{0}/api/User_Rating.php?accountid={1}", BASE_SERVER.Trim('/'), identifier);
-      return link;
-    }
-
-    internal static String CreateUserSeriesRating(String identifier, int seriesId)
-    {
-      return CreateBasicRating(identifier) + "&itemtype=series&itemid=" + seriesId;
-    }
-
-    internal static String CreateUserSeriesRating(String identifier, int seriesId, int rating)
-    {
-      return CreateUserSeriesRating(identifier, seriesId) + "&rating=" + rating;
-    }
-
-    internal static String CreateUserEpisodeRating(String identifier, int episodeId)
-    {
-      return CreateBasicRating(identifier) + "&itemtype=episode&itemid=" + episodeId;
-    }
-
-    internal static String CreateUserEpisodeRating(String identifier, int episodeId, int rating)
-    {
-      return CreateUserEpisodeRating(identifier, episodeId) + "&rating=" + rating;
-    }
-
-    #endregion
 
     /// <summary>
     /// Create link to get actor info
@@ -289,12 +262,42 @@ namespace MediaPortal.OnlineLibraries.TheTvDb
           siteString = "imdbid";
           break;
         default:
-          return "";//unknown site
+          return ""; //unknown site
       }
 
       String link = String.Format("{0}/api/GetSeriesByRemoteID.php?{1}={2}", BASE_SERVER, siteString, id);
       return link;
       //http://thetvdb.com/api/GetSeriesByRemoteID.php?imdbid=tt0411008
     }
+
+    #region Rating
+
+    private static String CreateBasicRating(String identifier)
+    {
+      String link = String.Format("{0}/api/User_Rating.php?accountid={1}", BASE_SERVER.Trim('/'), identifier);
+      return link;
+    }
+
+    internal static String CreateUserSeriesRating(String identifier, int seriesId)
+    {
+      return CreateBasicRating(identifier) + "&itemtype=series&itemid=" + seriesId;
+    }
+
+    internal static String CreateUserSeriesRating(String identifier, int seriesId, int rating)
+    {
+      return CreateUserSeriesRating(identifier, seriesId) + "&rating=" + rating;
+    }
+
+    internal static String CreateUserEpisodeRating(String identifier, int episodeId)
+    {
+      return CreateBasicRating(identifier) + "&itemtype=episode&itemid=" + episodeId;
+    }
+
+    internal static String CreateUserEpisodeRating(String identifier, int episodeId, int rating)
+    {
+      return CreateUserEpisodeRating(identifier, episodeId) + "&rating=" + rating;
+    }
+
+    #endregion
   }
 }

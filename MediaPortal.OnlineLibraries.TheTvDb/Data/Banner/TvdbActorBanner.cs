@@ -32,8 +32,5 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data.Banner
   ///         * No nudity, even if the actor is playing the role of a striper who is almost always nude, the images must be family safe. 
   /// </summary>
   [Serializable]
-  public class TvdbActorBanner: TvdbBanner
-  {
-
-  }
+  public class TvdbActorBanner : TvdbBanner {}
 }

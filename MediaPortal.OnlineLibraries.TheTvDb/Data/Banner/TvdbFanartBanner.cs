@@ -46,10 +46,7 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data.Banner
     /// <summary>
     /// TvdbFanartBanner constructor
     /// </summary>
-    public TvdbFanartBanner()
-    {
-
-    }
+    public TvdbFanartBanner() {}
 
     /// <summary>
     /// TvdbFanartBanner constructor
@@ -129,12 +126,14 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data.Banner
     /// <returns>True if successful, false otherwise</returns>
     public bool LoadVignette(bool replaceOld)
     {
-      bool wasLoaded = IsVignetteLoaded;//is the banner already loaded at this point
+      bool wasLoaded = IsVignetteLoaded; //is the banner already loaded at this point
       lock (_vignetteLoadingLock)
-      {//if another thread is already loading THIS banner, the lock will block this thread until the other thread
+      {
+        //if another thread is already loading THIS banner, the lock will block this thread until the other thread
         //has finished loading
         if (!wasLoaded && !replaceOld && IsVignetteLoaded)
-        {////the banner has already been loaded from a different thread and we don't want to replace it
+        {
+          ////the banner has already been loaded from a different thread and we don't want to replace it
           return false;
         }
         VignetteLoading = true;
@@ -143,7 +142,8 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data.Banner
           Image img = null;
           String cacheName = CreateCacheName(VignettePath, false);
           if (CacheProvider != null && CacheProvider.Initialised)
-          {//try to load the image from cache first
+          {
+            //try to load the image from cache first
             img = CacheProvider.LoadImageFromCache(SeriesId, cacheName);
           }
 
@@ -152,7 +152,8 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data.Banner
             img = LoadImage(TvdbLinkCreator.CreateBannerLink(VignettePath));
 
             if (img != null && CacheProvider != null && CacheProvider.Initialised)
-            {//store the image to cache
+            {
+              //store the image to cache
               CacheProvider.SaveToCache(img, SeriesId, cacheName);
             }
           }
@@ -209,7 +210,8 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data.Banner
     public bool UnloadVignette(bool saveToCache)
     {
       if (IsVignetteLoaded)
-      {//banner is currently loading
+      {
+        //banner is currently loading
         Log.Warn("Can't remove banner while it's loading");
         return false;
       }
@@ -220,10 +222,12 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data.Banner
           LoadVignette(null);
         }
         if (!saveToCache)
-        {//we don't want the image in cache -> if we already cached it it should be deleted
+        {
+          //we don't want the image in cache -> if we already cached it it should be deleted
           String cacheName = CreateCacheName(VignettePath, true);
           if (CacheProvider != null && CacheProvider.Initialised)
-          {//try to load the image from cache first
+          {
+            //try to load the image from cache first
             CacheProvider.RemoveImageFromCache(SeriesId, cacheName);
           }
         }

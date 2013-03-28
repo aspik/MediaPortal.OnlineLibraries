@@ -5,12 +5,16 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data.Comparer
   /// <summary>
   /// Compare episodes according to their default episode numbers (aired)
   /// </summary>
-  internal class EpisodeComparerAired: IComparer<TvdbEpisode>
+  internal class EpisodeComparerAired : IComparer<TvdbEpisode>
   {
+    #region IComparer<TvdbEpisode> Members
+
     public int Compare(TvdbEpisode x, TvdbEpisode y)
     {
       return x.EpisodeNumber - y.EpisodeNumber;
     }
+
+    #endregion
   }
 
   /// <summary>
@@ -18,10 +22,14 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data.Comparer
   /// </summary>
   internal class EpisodeComparerDvd : IComparer<TvdbEpisode>
   {
+    #region IComparer<TvdbEpisode> Members
+
     public int Compare(TvdbEpisode x, TvdbEpisode y)
     {
-      return (int)(x.DvdEpisodeNumber - y.DvdEpisodeNumber);
+      return (int) (x.DvdEpisodeNumber - y.DvdEpisodeNumber);
     }
+
+    #endregion
   }
 
   /// <summary>
@@ -29,9 +37,13 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data.Comparer
   /// </summary>
   internal class EpisodeComparerAbsolute : IComparer<TvdbEpisode>
   {
+    #region IComparer<TvdbEpisode> Members
+
     public int Compare(TvdbEpisode x, TvdbEpisode y)
     {
       return x.AbsoluteNumber - y.AbsoluteNumber;
     }
+
+    #endregion
   }
 }

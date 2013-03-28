@@ -30,6 +30,7 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data
   public class TvdbData
   {
     #region private properties
+
     private List<TvdbLanguage> _langInfo;
 
     #endregion
@@ -64,8 +65,8 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data
     public List<TvdbLanguage> LanguageList
     {
       get { return _langInfo; }
-      set 
-      { 
+      set
+      {
         _langInfo = value;
         TvDbUtils.LanguageList = value;
       }

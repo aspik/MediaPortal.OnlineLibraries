@@ -32,40 +32,46 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data.Banner
   /// More information on http://thetvdb.com/wiki/index.php/Series_Banners
   /// </summary>
   [Serializable]
-  public class TvdbSeriesBanner: TvdbBannerWithThumb
+  public class TvdbSeriesBanner : TvdbBannerWithThumb
   {
     #region private fields
 
     #endregion
 
+    #region Type enum
+
     /// <summary>
     /// Type of the series banner
     /// </summary>
-    public enum Type { 
+    public enum Type
+    {
       /// <summary>
       /// Banners contains a text of the seriesname
       /// </summary>
-      Text, 
+      Text,
+
       /// <summary>
       /// Banner containing a graphical representation of the seriesname
       /// </summary>
-      Graphical, 
+      Graphical,
+
       /// <summary>
       /// Banner containing a free space on the left side to place your own series description
       /// </summary>
-      Blank, 
+      Blank,
+
       /// <summary>
       /// Nothing specified
       /// </summary>
-      None };
+      None
+    };
+
+    #endregion
 
     /// <summary>
     /// TvdbSeriesBanner constructor
     /// </summary>
-    public TvdbSeriesBanner()
-    {
-
-    }
+    public TvdbSeriesBanner() {}
 
     /// <summary>
     /// TvdbSeriesBanner constructor

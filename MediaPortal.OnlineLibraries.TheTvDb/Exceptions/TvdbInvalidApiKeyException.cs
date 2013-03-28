@@ -33,17 +33,12 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Exceptions
     /// </summary>
     /// <param name="text">Message</param>
     public TvdbInvalidApiKeyException(String text)
-      : base(text)
-    {
-    }
+      : base(text) {}
 
     /// <summary>
     /// TvdbInvalidAPIKeyException constructor
     /// </summary>
     public TvdbInvalidApiKeyException()
-      : base()
-    {
-
-    }
+      : base() {}
   }
 }

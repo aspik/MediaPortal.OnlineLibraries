@@ -33,18 +33,12 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Exceptions
     /// </summary>
     /// <param name="msg">Message</param>
     public TvdbCacheNotInitialisedException(String msg)
-      : base(msg)
-    {
-
-    }
+      : base(msg) {}
 
     /// <summary>
     /// TvdbCacheNotInitialisedException constructor
     /// </summary>
     public TvdbCacheNotInitialisedException()
-      : base()
-    {
-
-    }
+      : base() {}
   }
 }

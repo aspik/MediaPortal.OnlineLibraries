@@ -28,24 +28,32 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data.Banner
   /// - Poster format: http://thetvdb.com/wiki/index.php/Season_Banners
   /// </summary>
   [Serializable]
-  public class TvdbSeasonBanner: TvdbBannerWithThumb
+  public class TvdbSeasonBanner : TvdbBannerWithThumb
   {
+    #region Type enum
+
     /// <summary>
     /// Type of the Season banner
     /// </summary>
-    public enum Type  { 
+    public enum Type
+    {
       /// <summary>
       /// Season banner (Poster format)
       /// </summary>
-      Season = 0, 
+      Season = 0,
+
       /// <summary>
       /// Wide Season banner (banner format)
       /// </summary>
-      SeasonWide = 1 , 
+      SeasonWide = 1,
+
       /// <summary>
       /// no format specified
       /// </summary>
-      None = 2};
+      None = 2
+    };
+
+    #endregion
 
     #region private fields
 

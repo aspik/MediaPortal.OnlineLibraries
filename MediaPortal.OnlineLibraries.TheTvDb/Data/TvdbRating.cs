@@ -29,18 +29,25 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data
 
     #endregion
 
+    #region ItemType enum
+
     /// <summary>
     /// Enum with all items on thetvdb that can be rated
     /// </summary>
-    public enum ItemType { 
+    public enum ItemType
+    {
       /// <summary>
       /// Item is a series
       /// </summary>
-      Series, 
+      Series,
+
       /// <summary>
       /// Item is an episode
       /// </summary>
-      Episode }
+      Episode
+    }
+
+    #endregion
 
     /// <summary>
     /// Which item type is this rating for

@@ -35,6 +35,7 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data.Banner
     #region private fields
 
     private readonly object _thumbLoadingLock = new object();
+
     #endregion
 
     /// <summary>
@@ -51,6 +52,11 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data.Banner
     /// Image of the thumbnail
     /// </summary>
     public Image ThumbImage { get; set; }
+
+    /// <summary>
+    /// Is the Image of the thumb already loaded
+    /// </summary>
+    public bool IsThumbLoaded { get; private set; }
 
 
     /// <summary>
@@ -72,12 +78,14 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data.Banner
     /// <returns>true if the loading completed sccessfully, false otherwise</returns>
     public bool LoadThumb(bool replaceOld)
     {
-      bool wasLoaded = IsThumbLoaded;//is the banner already loaded at this point
+      bool wasLoaded = IsThumbLoaded; //is the banner already loaded at this point
       lock (_thumbLoadingLock)
-      {//if another thread is already loading THIS banner, the lock will block this thread until the other thread
+      {
+        //if another thread is already loading THIS banner, the lock will block this thread until the other thread
         //has finished loading
         if (!wasLoaded && !replaceOld && IsThumbLoaded)
-        {////the banner has already been loaded from a different thread and we don't want to replace it
+        {
+          ////the banner has already been loaded from a different thread and we don't want to replace it
           return false;
         }
         ThumbLoading = true;
@@ -100,7 +108,8 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data.Banner
             String cacheName = CreateCacheName(ThumbPath, true);
 
             if (CacheProvider != null && CacheProvider.Initialised)
-            {//try to load the image from cache first
+            {
+              //try to load the image from cache first
               img = CacheProvider.LoadImageFromCache(SeriesId, cacheName);
             }
 
@@ -109,7 +118,8 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data.Banner
               img = LoadImage(TvdbLinkCreator.CreateBannerLink(ThumbPath));
 
               if (img != null && CacheProvider != null && CacheProvider.Initialised)
-              {//store the image to cache
+              {
+                //store the image to cache
                 CacheProvider.SaveToCache(img, SeriesId, cacheName);
               }
             }
@@ -167,7 +177,8 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data.Banner
     public bool UnloadThumb(bool saveToCache)
     {
       if (ThumbLoading)
-      {//banner is currently loading
+      {
+        //banner is currently loading
         Log.Warn("Can't remove banner while it's loading");
         return false;
       }
@@ -176,10 +187,12 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data.Banner
         if (IsThumbLoaded)
           LoadThumb(null);
         if (!saveToCache && ThumbPath != null && !ThumbPath.Equals(""))
-        {//we don't want the image in cache -> if we already cached it it should be deleted
+        {
+          //we don't want the image in cache -> if we already cached it it should be deleted
           String cacheName = CreateCacheName(ThumbPath, true);
           if (CacheProvider != null && CacheProvider.Initialised)
-          {//try to load the image from cache first
+          {
+            //try to load the image from cache first
             CacheProvider.RemoveImageFromCache(SeriesId, cacheName);
           }
         }
@@ -190,10 +203,5 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data.Banner
       }
       return true;
     }
-
-    /// <summary>
-    /// Is the Image of the thumb already loaded
-    /// </summary>
-    public bool IsThumbLoaded { get; private set; }
   }
 }

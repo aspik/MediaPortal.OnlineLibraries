@@ -20,13 +20,15 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Drawing;
 using System.Globalization;
+using System.Linq;
 
 namespace MediaPortal.OnlineLibraries.TheTvDb
 {
+
   #region enums
+
   /// <summary>
   /// ID's of external sites
   /// </summary>
@@ -47,14 +49,17 @@ namespace MediaPortal.OnlineLibraries.TheTvDb
     /// updated content since the last day
     /// </summary>
     Day = 0,
+
     /// <summary>
     /// updated content since the last week
     /// </summary>
     Week = 1,
+
     /// <summary>
     /// updated content since the last month
     /// </summary>
     Month = 2,
+
     /// <summary>
     /// the interval is determined automatically
     /// </summary>
@@ -68,17 +73,6 @@ namespace MediaPortal.OnlineLibraries.TheTvDb
     public const int NO_VALUE = -99;
 
     /// <summary>
-    /// Type when handling user favorites
-    /// </summary>
-    internal enum UserFavouriteAction { None, Add, Remove }
-
-    #region private fields
-
-    private static NumberFormatInfo _formatProvider;
-
-    #endregion
-    
-    /// <summary>
     /// Parses an integer string and returns the number or <see cref="NO_VALUE"/> if the format
     /// is invalid
     /// </summary>
@@ -88,7 +82,7 @@ namespace MediaPortal.OnlineLibraries.TheTvDb
     {
       //check this or we have a badass performance problem because everytime we have
       //an empty field an exception would be thrown
-      if (string.IsNullOrEmpty(number)) 
+      if (string.IsNullOrEmpty(number))
         return NO_VALUE;
 
       int result;
@@ -105,7 +99,7 @@ namespace MediaPortal.OnlineLibraries.TheTvDb
     {
       //check this or we have a badass performance problem because everytime we have
       //an empty field an exception would be thrown
-      if (string.IsNullOrEmpty(number)) 
+      if (string.IsNullOrEmpty(number))
         return NO_VALUE;
 
       long result;
@@ -123,8 +117,9 @@ namespace MediaPortal.OnlineLibraries.TheTvDb
       try
       {
         if (_formatProvider == null)
-        {//format provider, so we can parse 23.23 as well as 23,23
-          _formatProvider = new NumberFormatInfo { NumberGroupSeparator = "." };
+        {
+          //format provider, so we can parse 23.23 as well as 23,23
+          _formatProvider = new NumberFormatInfo {NumberGroupSeparator = "."};
         }
         //check this or we have a badass performance problem because everytime we have
         //an empty field an exception would be thrown
@@ -150,7 +145,7 @@ namespace MediaPortal.OnlineLibraries.TheTvDb
       String[] values = text.Split('|');
       return values.Where(v => !v.Equals("")).ToList();
     }
-    
+
     /// <summary>
     /// Converts a unix timestamp (used on tvdb) into a .net datetime object
     /// </summary>
@@ -185,7 +180,7 @@ namespace MediaPortal.OnlineLibraries.TheTvDb
     {
       TimeSpan span = new TimeSpan(DateTime.Parse("1/1/1970").Ticks);
       DateTime time = date.Subtract(span);
-      int t = (int)(time.Ticks / 10000000);
+      int t = (int) (time.Ticks/10000000);
 
       return t.ToString();
     }
@@ -298,5 +293,25 @@ namespace MediaPortal.OnlineLibraries.TheTvDb
       DateTime.TryParse(date, out retVal);
       return retVal;
     }
+
+    #region Nested type: UserFavouriteAction
+
+    /// <summary>
+    /// Type when handling user favorites
+    /// </summary>
+    internal enum UserFavouriteAction
+    {
+      None,
+      Add,
+      Remove
+    }
+
+    #endregion
+
+    #region private fields
+
+    private static NumberFormatInfo _formatProvider;
+
+    #endregion
   }
 }

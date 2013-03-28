@@ -36,12 +36,12 @@ namespace MediaPortal.OnlineLibraries.TheMovieDb
 
     public const string DefaultLanguage = "en";
 
-    private const string URL_API_BASE =   "http://api.themoviedb.org/3/";
-    private const string URL_QUERY =      URL_API_BASE + "search/movie";
-    private const string URL_GETMOVIE =   URL_API_BASE + "movie/{0}";
+    private const string URL_API_BASE = "http://api.themoviedb.org/3/";
+    private const string URL_QUERY = URL_API_BASE + "search/movie";
+    private const string URL_GETMOVIE = URL_API_BASE + "movie/{0}";
     private const string URL_GETCASTCREW = URL_API_BASE + "movie/{0}/casts";
-    private const string URL_GETIMAGES =  URL_API_BASE + "movie/{0}/images";
-    private const string URL_GETCONFIG =  URL_API_BASE + "configuration";
+    private const string URL_GETIMAGES = URL_API_BASE + "movie/{0}/images";
+    private const string URL_GETCONFIG = URL_API_BASE + "configuration";
 
     #endregion
 
@@ -49,8 +49,8 @@ namespace MediaPortal.OnlineLibraries.TheMovieDb
 
     private readonly string _apiKey;
     private readonly string _cachePath;
-    private Configuration _configuration;
     private readonly Downloader _downloader;
+    private Configuration _configuration;
 
     #endregion
 
@@ -75,7 +75,7 @@ namespace MediaPortal.OnlineLibraries.TheMovieDb
     {
       _apiKey = apiKey;
       _cachePath = cachePath;
-      _downloader = new Downloader { EnableCompression = true };
+      _downloader = new Downloader {EnableCompression = true};
       _downloader.Headers["Accept"] = "application/json";
     }
 
@@ -200,7 +200,8 @@ namespace MediaPortal.OnlineLibraries.TheMovieDb
       if (string.IsNullOrEmpty(cacheFileName))
         return false;
 
-      string sourceUri = Configuration.Images.BaseUrl + "original" + (usePoster ? movieCollection.PosterPath : movieCollection.BackdropPath);
+      string sourceUri = Configuration.Images.BaseUrl + "original" +
+                         (usePoster ? movieCollection.PosterPath : movieCollection.BackdropPath);
       _downloader.DownloadFile(sourceUri, cacheFileName);
       return true;
     }
@@ -219,8 +220,10 @@ namespace MediaPortal.OnlineLibraries.TheMovieDb
     protected string GetUrl(string urlBase, string language, params object[] args)
     {
       string replacedUrl = string.Format(urlBase, args);
-      return string.Format("{0}?api_key={1}", replacedUrl, _apiKey) + (string.IsNullOrEmpty(language) ? "" : "&language=" + language);
+      return string.Format("{0}?api_key={1}", replacedUrl, _apiKey) +
+             (string.IsNullOrEmpty(language) ? "" : "&language=" + language);
     }
+
     /// <summary>
     /// Creates a local file name for loading and saving <see cref="MovieImage"/>s.
     /// </summary>
@@ -234,7 +237,7 @@ namespace MediaPortal.OnlineLibraries.TheMovieDb
         string folder = Path.Combine(_cachePath, string.Format(@"{0}\{1}", image.MovieId, category));
         if (!Directory.Exists(folder))
           Directory.CreateDirectory(folder);
-        return Path.Combine(folder, image.FilePath.TrimStart(new[] { '/' }));
+        return Path.Combine(folder, image.FilePath.TrimStart(new[] {'/'}));
       }
       catch
       {
@@ -253,13 +256,14 @@ namespace MediaPortal.OnlineLibraries.TheMovieDb
     {
       try
       {
-        string folder = Path.Combine(_cachePath, string.Format(@"COLL_{0}\{1}", collection.Id, usePoster ? "Posters" : "Backdrops"));
+        string folder = Path.Combine(_cachePath,
+                                     string.Format(@"COLL_{0}\{1}", collection.Id, usePoster ? "Posters" : "Backdrops"));
         if (!Directory.Exists(folder))
           Directory.CreateDirectory(folder);
         string fileName = usePoster ? collection.PosterPath : collection.BackdropPath;
         if (string.IsNullOrEmpty(fileName))
           return null;
-        return Path.Combine(folder, fileName.TrimStart(new[] { '/' }));
+        return Path.Combine(folder, fileName.TrimStart(new[] {'/'}));
       }
       catch
       {

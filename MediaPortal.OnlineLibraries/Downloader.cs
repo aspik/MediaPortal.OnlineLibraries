@@ -33,6 +33,11 @@ namespace MediaPortal.OnlineLibraries
 {
   public class Downloader
   {
+    public Downloader()
+    {
+      Headers = new Dictionary<string, string>();
+    }
+
     /// <summary>
     /// Dictionary of additional http headers to be added for each request.
     /// </summary>
@@ -42,11 +47,6 @@ namespace MediaPortal.OnlineLibraries
     /// Enables gzip/deflate compression for web requests.
     /// </summary>
     public bool EnableCompression { get; set; }
-
-    public Downloader()
-    {
-      Headers = new Dictionary<string, string>();
-    }
 
     /// <summary>
     /// Downloads the requested information from the JSON api and deserializes the response to the requested <typeparam name="TE">Type</typeparam>.
@@ -71,7 +71,7 @@ namespace MediaPortal.OnlineLibraries
     /// <returns>JSON result</returns>
     protected string DownloadJSON(string url)
     {
-      CompressionWebClient webClient = new CompressionWebClient(EnableCompression) { Encoding = Encoding.UTF8 };
+      CompressionWebClient webClient = new CompressionWebClient(EnableCompression) {Encoding = Encoding.UTF8};
       foreach (KeyValuePair<string, string> headerEntry in Headers)
         webClient.Headers[headerEntry.Key] = headerEntry.Value;
 

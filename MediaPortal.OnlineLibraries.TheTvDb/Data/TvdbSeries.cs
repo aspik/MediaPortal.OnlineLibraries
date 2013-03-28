@@ -67,7 +67,9 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data
   public class TvdbSeries : TvdbSeriesFields
   {
     #region private properties
+
     private Dictionary<TvdbLanguage, TvdbSeriesFields> _seriesTranslations;
+
     #endregion
 
     /// <summary>
@@ -78,7 +80,6 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data
       _banners = new List<TvdbBanner>();
       _bannersLoaded = false;
       _tvdbActorsLoaded = false;
-
     }
 
     /// <summary>
@@ -93,85 +94,6 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data
       //UpdateTvdbFields(_fields, true);
     }
 
-
-    internal void SetEpisodes(List<TvdbEpisode> episodes)
-    {
-      foreach (KeyValuePair<TvdbLanguage, TvdbSeriesFields> kvp in _seriesTranslations)
-      {
-        if (kvp.Key.Abbriviation.Equals(Language.Abbriviation))
-        {
-          kvp.Value.EpisodesLoaded = true;
-          kvp.Value.Episodes.Clear();
-          kvp.Value.Episodes.AddRange(episodes);
-        }
-      }
-
-      EpisodesLoaded = true;
-      Episodes.Clear();
-      Episodes.AddRange(episodes);
-    }
-
-    /// <summary>
-    /// Add a new language to the series
-    /// </summary>
-    /// <param name="fields"></param>
-    internal void AddLanguage(TvdbSeriesFields fields)
-    {
-      if (_seriesTranslations == null)
-        _seriesTranslations = new Dictionary<TvdbLanguage, TvdbSeriesFields>();
-
-      //delete translation if it already exists and overwrite it with a new one
-      if (_seriesTranslations.ContainsKey(fields.Language))
-        _seriesTranslations.Remove(fields.Language);
-
-      /*foreach (KeyValuePair<TvdbLanguage, TvdbSeriesFields> kvp in _seriesTranslations)
-      {
-        if (kvp.Key == _fields.Language)
-        {
-          _seriesTranslations.Remove(kvp.Key);
-        }
-      }*/
-
-      _seriesTranslations.Add(fields.Language, fields);
-    }
-
-    /// <summary>
-    /// Set the language of the series to one of the languages that have
-    /// already been loaded
-    /// </summary>
-    /// <param name="language">The new language for this series</param>
-    /// <returns>true if success, false otherwise</returns>
-    public bool SetLanguage(TvdbLanguage language)
-    {
-      return SetLanguage(language.Abbriviation);
-    }
-
-    /// <summary>
-    /// Set the language of the series to one of the languages that have
-    /// already been loaded
-    /// </summary>
-    /// <param name="language">The new language abbriviation for this series</param>
-    /// <returns>true if success, false otherwise</returns>
-    public bool SetLanguage(String language)
-    {
-      foreach (KeyValuePair<TvdbLanguage, TvdbSeriesFields> kvp in _seriesTranslations.Where(kvp => kvp.Key.Abbriviation.Equals(language)))
-      {
-        UpdateTvdbFields(kvp.Value, true);
-        return true;
-      }
-      return false;
-    }
-
-
-    /// <summary>
-    /// Get all languages that have already been loaded for this series
-    /// </summary>
-    /// <returns>List of all translations that are loaded for this series</returns>
-    public List<TvdbLanguage> GetAvailableLanguages()
-    {
-      return _seriesTranslations != null ? _seriesTranslations.Keys.ToList() : null;
-    }
-
     /// <summary>
     /// Get all available Translations
     /// </summary>
@@ -182,6 +104,7 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data
     }
 
     #region user properties
+
     private bool _isFavorite;
 
     /// <summary>
@@ -196,6 +119,7 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data
     #endregion
 
     #region tvdb properties
+
     /// <summary>
     /// Returns the genre string in the format | genre1 | genre2 | genre3 |
     /// </summary>
@@ -270,10 +194,7 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data
     /// </summary>
     public List<TvdbSeriesBanner> SeriesBanners
     {
-      get
-      {
-        return Banners.OfType<TvdbSeriesBanner>().ToList();
-      }
+      get { return Banners.OfType<TvdbSeriesBanner>().ToList(); }
     }
 
     /// <summary>
@@ -281,10 +202,7 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data
     /// </summary>
     public List<TvdbSeasonBanner> SeasonBanners
     {
-      get
-      {
-        return Banners.OfType<TvdbSeasonBanner>().ToList();
-      }
+      get { return Banners.OfType<TvdbSeasonBanner>().ToList(); }
     }
 
     /// <summary>
@@ -292,10 +210,7 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data
     /// </summary>
     public List<TvdbPosterBanner> PosterBanners
     {
-      get
-      {
-        return Banners.OfType<TvdbPosterBanner>().ToList();
-      }
+      get { return Banners.OfType<TvdbPosterBanner>().ToList(); }
     }
 
     /// <summary>
@@ -303,28 +218,12 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data
     /// </summary>
     public List<TvdbFanartBanner> FanartBanners
     {
-      get
-      {
-        return Banners.OfType<TvdbFanartBanner>().ToList();
-      }
+      get { return Banners.OfType<TvdbFanartBanner>().ToList(); }
     }
 
     #endregion
 
     #region episodes
-
-    /// <summary>
-    /// Return a list of episodes for the given Season
-    /// </summary>
-    /// <param name="season">Season for which episodes should be returned</param>
-    /// <returns>List of episodes for the given Season</returns>
-    public List<TvdbEpisode> GetEpisodes(int season)
-    {
-      List<TvdbEpisode> retList = new List<TvdbEpisode>();
-      if (Episodes != null && Episodes.Count > 0 && EpisodesLoaded)
-        retList.AddRange(Episodes.Where(e => e.SeasonNumber == season));
-      return retList;
-    }
 
     /// <summary>
     /// How many Season does the series have
@@ -346,10 +245,23 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data
       }
     }
 
+    /// <summary>
+    /// Return a list of episodes for the given Season
+    /// </summary>
+    /// <param name="season">Season for which episodes should be returned</param>
+    /// <returns>List of episodes for the given Season</returns>
+    public List<TvdbEpisode> GetEpisodes(int season)
+    {
+      List<TvdbEpisode> retList = new List<TvdbEpisode>();
+      if (Episodes != null && Episodes.Count > 0 && EpisodesLoaded)
+        retList.AddRange(Episodes.Where(e => e.SeasonNumber == season));
+      return retList;
+    }
 
     #endregion
 
     #region Actors
+
     //Actor Information
     private List<TvdbActor> _tvdbActors;
     private bool _tvdbActorsLoaded;
@@ -375,7 +287,88 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data
       get { return _tvdbActorsLoaded; }
       set { _tvdbActorsLoaded = value; }
     }
+
     #endregion
+
+    internal void SetEpisodes(List<TvdbEpisode> episodes)
+    {
+      foreach (KeyValuePair<TvdbLanguage, TvdbSeriesFields> kvp in _seriesTranslations)
+      {
+        if (kvp.Key.Abbriviation.Equals(Language.Abbriviation))
+        {
+          kvp.Value.EpisodesLoaded = true;
+          kvp.Value.Episodes.Clear();
+          kvp.Value.Episodes.AddRange(episodes);
+        }
+      }
+
+      EpisodesLoaded = true;
+      Episodes.Clear();
+      Episodes.AddRange(episodes);
+    }
+
+    /// <summary>
+    /// Add a new language to the series
+    /// </summary>
+    /// <param name="fields"></param>
+    internal void AddLanguage(TvdbSeriesFields fields)
+    {
+      if (_seriesTranslations == null)
+        _seriesTranslations = new Dictionary<TvdbLanguage, TvdbSeriesFields>();
+
+      //delete translation if it already exists and overwrite it with a new one
+      if (_seriesTranslations.ContainsKey(fields.Language))
+        _seriesTranslations.Remove(fields.Language);
+
+      /*foreach (KeyValuePair<TvdbLanguage, TvdbSeriesFields> kvp in _seriesTranslations)
+      {
+        if (kvp.Key == _fields.Language)
+        {
+          _seriesTranslations.Remove(kvp.Key);
+        }
+      }*/
+
+      _seriesTranslations.Add(fields.Language, fields);
+    }
+
+    /// <summary>
+    /// Set the language of the series to one of the languages that have
+    /// already been loaded
+    /// </summary>
+    /// <param name="language">The new language for this series</param>
+    /// <returns>true if success, false otherwise</returns>
+    public bool SetLanguage(TvdbLanguage language)
+    {
+      return SetLanguage(language.Abbriviation);
+    }
+
+    /// <summary>
+    /// Set the language of the series to one of the languages that have
+    /// already been loaded
+    /// </summary>
+    /// <param name="language">The new language abbriviation for this series</param>
+    /// <returns>true if success, false otherwise</returns>
+    public bool SetLanguage(String language)
+    {
+      foreach (
+        KeyValuePair<TvdbLanguage, TvdbSeriesFields> kvp in
+          _seriesTranslations.Where(kvp => kvp.Key.Abbriviation.Equals(language)))
+      {
+        UpdateTvdbFields(kvp.Value, true);
+        return true;
+      }
+      return false;
+    }
+
+
+    /// <summary>
+    /// Get all languages that have already been loaded for this series
+    /// </summary>
+    /// <returns>List of all translations that are loaded for this series</returns>
+    public List<TvdbLanguage> GetAvailableLanguages()
+    {
+      return _seriesTranslations != null ? _seriesTranslations.Keys.ToList() : null;
+    }
 
     /// <summary>
     /// returns SeriesName (SeriesId)
@@ -416,7 +409,8 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data
       Zap2itId = series.Zap2itId;
 
       if (series.EpisodesLoaded)
-      {//check if the old series has any images loaded already -> if yes, save them
+      {
+        //check if the old series has any images loaded already -> if yes, save them
         if (EpisodesLoaded)
         {
           foreach (TvdbEpisode oe in Episodes)
@@ -438,7 +432,8 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data
       }
 
       if (series.TvdbActorsLoaded)
-      {//check if the old series has any images loaded already -> if yes, save them
+      {
+        //check if the old series has any images loaded already -> if yes, save them
         if (TvdbActorsLoaded)
         {
           foreach (TvdbActor oa in TvdbActors)
@@ -463,15 +458,16 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data
           {
             foreach (TvdbBanner nb in series.Banners)
             {
-              if (ob.BannerPath.Equals(nb.BannerPath))//I have to check for the banner path since the Update file doesn't include IDs
+              if (ob.BannerPath.Equals(nb.BannerPath))
+                //I have to check for the banner path since the Update file doesn't include IDs
               {
                 if (ob.BannerImage != null && ob.IsLoaded)
                   nb.BannerImage = ob.BannerImage;
 
                 if (ob.GetType() == typeof(TvdbFanartBanner))
                 {
-                  TvdbFanartBanner newFaBanner = (TvdbFanartBanner)nb;
-                  TvdbFanartBanner oldFaBanner = (TvdbFanartBanner)ob;
+                  TvdbFanartBanner newFaBanner = (TvdbFanartBanner) nb;
+                  TvdbFanartBanner oldFaBanner = (TvdbFanartBanner) ob;
 
                   if (oldFaBanner.ThumbImage != null && oldFaBanner.IsThumbLoaded)
                     newFaBanner.ThumbImage = oldFaBanner.ThumbImage;

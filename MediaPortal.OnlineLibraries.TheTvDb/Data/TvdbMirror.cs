@@ -47,9 +47,7 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data
     /// TvdbMirror constructor
     /// </summary>
     public TvdbMirror()
-      : this(Util.NO_VALUE, null, Util.NO_VALUE)
-    {
-    }
+      : this(Util.NO_VALUE, null, Util.NO_VALUE) {}
 
     /// <summary>
     /// TvdbMirror constructor
@@ -94,7 +92,7 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data
     /// Returns true if the mirror offers xml files for downloading, false otherwise
     ///</summary>
     public bool OffersXml
-    {      
+    {
       get
       {
         //all uneven TypeMasks indicate the mirror offers xml files
@@ -107,12 +105,11 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data
     ///</summary>
     public bool OffersZip
     {
-     get
-     {
-       //if typemask is 4 or higher, it has to contain zipped files (1+2=3 ;))
-       return (TypeMask >= 4);
-     }
-
+      get
+      {
+        //if typemask is 4 or higher, it has to contain zipped files (1+2=3 ;))
+        return (TypeMask >= 4);
+      }
     }
 
     /// <summary>

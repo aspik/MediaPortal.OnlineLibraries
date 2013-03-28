@@ -22,26 +22,20 @@ using System;
 
 namespace MediaPortal.OnlineLibraries.TheTvDb.Exceptions
 {
-	/// <summary>
-	/// Description of TvdbInvalidXmlException.
-	/// </summary>
-	public class TvdbInvalidXmlException: TvdbException
-	{
-		/// <summary>
-		/// TvdbInvalidXmlException constructor
-		/// </summary>
-		/// <param name="text">Message</param>
-		public TvdbInvalidXmlException(String text): base(text)
-		{
-			
-		}
-		
-		/// <summary>
-		/// TvdbInvalidXmlException constructor
-		/// </summary>
-		public TvdbInvalidXmlException(): base()
-		{
-			
-		}
-	}
+  /// <summary>
+  /// Description of TvdbInvalidXmlException.
+  /// </summary>
+  public class TvdbInvalidXmlException : TvdbException
+  {
+    /// <summary>
+    /// TvdbInvalidXmlException constructor
+    /// </summary>
+    /// <param name="text">Message</param>
+    public TvdbInvalidXmlException(String text) : base(text) {}
+
+    /// <summary>
+    /// TvdbInvalidXmlException constructor
+    /// </summary>
+    public TvdbInvalidXmlException() : base() {}
+  }
 }

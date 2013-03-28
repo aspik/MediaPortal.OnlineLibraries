@@ -32,10 +32,7 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Data
     /// <summary>
     /// TvdbSearchResult constructor
     /// </summary>
-    public TvdbSearchResult()
-    {
-
-    }
+    public TvdbSearchResult() {}
 
     /// <summary>
     /// TvdbSearchResult constructor

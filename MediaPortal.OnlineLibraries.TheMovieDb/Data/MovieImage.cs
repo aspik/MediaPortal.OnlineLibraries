@@ -53,7 +53,7 @@ namespace MediaPortal.OnlineLibraries.TheMovieDb.Data
 
     [DataMember(Name = "iso_639_1")]
     public string Language { get; set; }
-    
+
     public override string ToString()
     {
       return FilePath;

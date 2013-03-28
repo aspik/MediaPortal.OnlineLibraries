@@ -20,10 +20,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Runtime.Serialization;
 using System.Drawing;
+using System.IO;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using MediaPortal.OnlineLibraries.TheTvDb.Data;
 using MediaPortal.OnlineLibraries.TheTvDb.Data.Banner;
 
@@ -37,6 +37,7 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Cache
   public class BinaryCacheProvider : ICacheProvider
   {
     #region class that holds configuration for each series
+
     /// <summary>
     /// Class to store what parts of the cached series has been loaded
     /// </summary>
@@ -46,6 +47,21 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Cache
       #region private fields
 
       #endregion
+
+      /// <summary>
+      /// constructor
+      /// </summary>
+      /// <param name="seriesId">Id of series</param>
+      /// <param name="episodesLoaded">Are episodes loaded</param>
+      /// <param name="bannersLoaded">Are banners loaded</param>
+      /// <param name="actorsLoaded">Are actors loaded</param>
+      internal SeriesConfiguration(int seriesId, bool episodesLoaded, bool bannersLoaded, bool actorsLoaded)
+      {
+        SeriesId = seriesId;
+        EpisodesLoaded = episodesLoaded;
+        BannersLoaded = bannersLoaded;
+        ActorsLoaded = actorsLoaded;
+      }
 
       /// <summary>
       /// Are actors loaded
@@ -66,26 +82,13 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Cache
       /// Id of series
       /// </summary>
       internal int SeriesId { get; set; }
-
-      /// <summary>
-      /// constructor
-      /// </summary>
-      /// <param name="seriesId">Id of series</param>
-      /// <param name="episodesLoaded">Are episodes loaded</param>
-      /// <param name="bannersLoaded">Are banners loaded</param>
-      /// <param name="actorsLoaded">Are actors loaded</param>
-      internal SeriesConfiguration(int seriesId, bool episodesLoaded, bool bannersLoaded, bool actorsLoaded)
-      {
-        SeriesId = seriesId;
-        EpisodesLoaded = episodesLoaded;
-        BannersLoaded = bannersLoaded;
-        ActorsLoaded = actorsLoaded;
-      }
     }
+
     #endregion
 
     #region private fields
-    private readonly BinaryFormatter _formatter;//Formatter to serialize/deserialize messages
+
+    private readonly BinaryFormatter _formatter; //Formatter to serialize/deserialize messages
     private readonly String _rootFolder;
     private FileStream _filestream;
 
@@ -111,7 +114,7 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Cache
     {
       List<TvdbLanguage> languages = LoadLanguageListFromCache();
       DateTime lastUpdated = LoadLastUpdatedFromCache();
-      TvdbData data = new TvdbData(languages) { LastUpdated = lastUpdated };
+      TvdbData data = new TvdbData(languages) {LastUpdated = lastUpdated};
       return data;
     }
 
@@ -134,7 +137,7 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Cache
         if (data == null)
         {
           //the cache has never been initialised before -> do it now
-          data = new TvdbData { LanguageList = new List<TvdbLanguage>(), LastUpdated = DateTime.Now };
+          data = new TvdbData {LanguageList = new List<TvdbLanguage>(), LastUpdated = DateTime.Now};
           SaveToCache(data);
         }
         Initialised = true;
@@ -166,18 +169,6 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Cache
       SaveToCache(content.LastUpdated);
     }
 
-    /// <summary>
-    /// Saves the time of the last update to cache
-    /// </summary>
-    /// <param name="time">time of last update</param>
-    private void SaveToCache(DateTime time)
-    {
-      if (!Directory.Exists(_rootFolder)) Directory.CreateDirectory(_rootFolder);
-      _filestream = new FileStream(_rootFolder + Path.DirectorySeparatorChar + "lastUpdated.ser", FileMode.Create);
-      _formatter.Serialize(_filestream, time);
-      _filestream.Close();
-    }
-
 
     /// <summary>
     /// Save the language to cache
@@ -195,22 +186,6 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Cache
     }
 
     /// <summary>
-    /// Save the mirror info to cache
-    /// </summary>
-    /// <param name="mirrorInfo">list of mirrors</param>
-    [Obsolete("Not used any more, however if won't delete the class since it could be useful at some point")]
-    public void SaveToCache(List<TvdbMirror> mirrorInfo)
-    {
-      if (mirrorInfo != null)
-      {
-        if (!Directory.Exists(_rootFolder)) Directory.CreateDirectory(_rootFolder);
-        _filestream = new FileStream(_rootFolder + Path.DirectorySeparatorChar + "mirrorInfo.ser", FileMode.Create);
-        _formatter.Serialize(_filestream, mirrorInfo);
-        _filestream.Close();
-      }
-    }
-
-    /// <summary>
     /// Loads the available languages from cache
     /// </summary>
     /// <returns>List of available languages</returns>
@@ -221,39 +196,13 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Cache
         try
         {
           FileStream fs = new FileStream(_rootFolder + Path.DirectorySeparatorChar + "languageInfo.ser", FileMode.Open);
-          List<TvdbLanguage> retValue = (List<TvdbLanguage>)_formatter.Deserialize(fs);
+          List<TvdbLanguage> retValue = (List<TvdbLanguage>) _formatter.Deserialize(fs);
           fs.Close();
           return retValue;
         }
         catch (SerializationException)
         {
           return null;
-
-        }
-      }
-      return null;
-    }
-
-    /// <summary>
-    /// Load the available mirrors from cache
-    /// </summary>
-    /// <returns>List of available mirrors</returns>
-    [Obsolete("Not used any more, however if won't delete the class since it could be useful at some point")]
-    public List<TvdbMirror> LoadMirrorListFromCache()
-    {
-      if (File.Exists(_rootFolder + Path.DirectorySeparatorChar + "mirrorInfo.ser"))
-      {
-        try
-        {
-          FileStream fs = new FileStream(_rootFolder + Path.DirectorySeparatorChar + "mirrorInfo.ser", FileMode.Open);
-          List<TvdbMirror> retValue = (List<TvdbMirror>)_formatter.Deserialize(fs);
-          fs.Close();
-          return retValue;
-        }
-        catch (SerializationException)
-        {
-          return null;
-
         }
       }
       return null;
@@ -273,14 +222,13 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Cache
         try
         {
           FileStream fs = new FileStream(seriesFile, FileMode.Open);
-          TvdbSeries retValue = (TvdbSeries)_formatter.Deserialize(fs);
+          TvdbSeries retValue = (TvdbSeries) _formatter.Deserialize(fs);
           fs.Close();
           return retValue;
         }
         catch (SerializationException)
         {
           return null;
-
         }
       }
       return null;
@@ -303,7 +251,8 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Cache
         foreach (TvdbBanner b in series.Banners)
         {
           if (b.IsLoaded)
-          {//banner is loaded
+          {
+            //banner is loaded
             b.UnloadBanner();
           }
 
@@ -311,18 +260,20 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Cache
           b.CacheProvider = null;
 
           if (b.GetType() == typeof(TvdbBannerWithThumb))
-          {//thumb is loaded
-            if (((TvdbBannerWithThumb)b).IsThumbLoaded)
+          {
+            //thumb is loaded
+            if (((TvdbBannerWithThumb) b).IsThumbLoaded)
             {
-              ((TvdbBannerWithThumb)b).UnloadThumb();
+              ((TvdbBannerWithThumb) b).UnloadThumb();
             }
           }
 
           if (b.GetType() == typeof(TvdbFanartBanner))
-          {//vignette is loaded
-            if (((TvdbFanartBanner)b).IsVignetteLoaded)
+          {
+            //vignette is loaded
+            if (((TvdbFanartBanner) b).IsVignetteLoaded)
             {
-              ((TvdbFanartBanner)b).UnloadVignette();
+              ((TvdbFanartBanner) b).UnloadVignette();
             }
           }
         }
@@ -354,16 +305,20 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Cache
             e.Banner.CacheProvider = null;
           }
         }
+
         #endregion
+
         //serialize series to hdd
-        _filestream = new FileStream(seriesRoot + Path.DirectorySeparatorChar + "series_" + series.Id + ".ser", FileMode.Create);
+        _filestream = new FileStream(seriesRoot + Path.DirectorySeparatorChar + "series_" + series.Id + ".ser",
+                                     FileMode.Create);
         _formatter.Serialize(_filestream, series);
         _filestream.Close();
 
         //serialize series config to hdd
         SeriesConfiguration cfg = new SeriesConfiguration(series.Id, series.EpisodesLoaded,
-                                                  series.BannersLoaded, series.TvdbActorsLoaded);
-        _filestream = new FileStream(seriesRoot + Path.DirectorySeparatorChar + "series_" + series.Id + ".cfg", FileMode.Create);
+                                                          series.BannersLoaded, series.TvdbActorsLoaded);
+        _filestream = new FileStream(seriesRoot + Path.DirectorySeparatorChar + "series_" + series.Id + ".cfg",
+                                     FileMode.Create);
         _formatter.Serialize(_filestream, cfg);
         _filestream.Close();
       }
@@ -378,7 +333,8 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Cache
       if (user != null)
       {
         if (!Directory.Exists(_rootFolder)) Directory.CreateDirectory(_rootFolder);
-        _filestream = new FileStream(_rootFolder + Path.DirectorySeparatorChar + "user_" + user.UserIdentifier + ".ser", FileMode.Create);
+        _filestream = new FileStream(
+          _rootFolder + Path.DirectorySeparatorChar + "user_" + user.UserIdentifier + ".ser", FileMode.Create);
         _formatter.Serialize(_filestream, user);
         _filestream.Close();
       }
@@ -423,15 +379,15 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Cache
       {
         try
         {
-          FileStream fs = new FileStream(_rootFolder + Path.DirectorySeparatorChar + "user_" + userId + ".ser", FileMode.Open);
-          TvdbUser retValue = (TvdbUser)_formatter.Deserialize(fs);
+          FileStream fs = new FileStream(_rootFolder + Path.DirectorySeparatorChar + "user_" + userId + ".ser",
+                                         FileMode.Open);
+          TvdbUser retValue = (TvdbUser) _formatter.Deserialize(fs);
           fs.Close();
           return retValue;
         }
         catch (SerializationException)
         {
           return null;
-
         }
       }
       return null;
@@ -482,12 +438,12 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Cache
         try
         {
           FileStream fs = new FileStream(fName, FileMode.Open);
-          SeriesConfiguration config = (SeriesConfiguration)_formatter.Deserialize(fs);
+          SeriesConfiguration config = (SeriesConfiguration) _formatter.Deserialize(fs);
           fs.Close();
 
           return config.EpisodesLoaded || !checkEpisodesLoaded &&
-                 config.BannersLoaded || !checkBannersLoaded &&
-                 config.ActorsLoaded || !checkActorsLoaded;
+                                          config.BannersLoaded || !checkBannersLoaded &&
+                                                                  config.ActorsLoaded || !checkActorsLoaded;
         }
         catch (SerializationException)
         {
@@ -616,20 +572,24 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Cache
       String fName = string.Format("{0}{1}{2}{1}{3}", _rootFolder, Path.DirectorySeparatorChar, seriesId, fileName);
 
       if (File.Exists(fName))
-      {//the image is cached
+      {
+        //the image is cached
         try
-        {//trying to delete the file
+        {
+          //trying to delete the file
           File.Delete(fName);
           return true;
         }
         catch (Exception ex)
-        {//error while deleting the image
+        {
+          //error while deleting the image
           Log.Warn("Couldn't delete image " + fileName + " for series " + seriesId, ex);
           return false;
         }
       }
       else
-      {//image isn't cached in the first place
+      {
+        //image isn't cached in the first place
         return false;
       }
     }
@@ -649,7 +609,7 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Cache
         try
         {
           FileStream fs = new FileStream(_rootFolder + Path.DirectorySeparatorChar + "lastUpdated.ser", FileMode.Open);
-          DateTime retValue = (DateTime)_formatter.Deserialize(fs);
+          DateTime retValue = (DateTime) _formatter.Deserialize(fs);
           fs.Close();
           return retValue;
         }
@@ -663,5 +623,56 @@ namespace MediaPortal.OnlineLibraries.TheTvDb.Cache
 
     #endregion
 
+    /// <summary>
+    /// Saves the time of the last update to cache
+    /// </summary>
+    /// <param name="time">time of last update</param>
+    private void SaveToCache(DateTime time)
+    {
+      if (!Directory.Exists(_rootFolder)) Directory.CreateDirectory(_rootFolder);
+      _filestream = new FileStream(_rootFolder + Path.DirectorySeparatorChar + "lastUpdated.ser", FileMode.Create);
+      _formatter.Serialize(_filestream, time);
+      _filestream.Close();
+    }
+
+    /// <summary>
+    /// Save the mirror info to cache
+    /// </summary>
+    /// <param name="mirrorInfo">list of mirrors</param>
+    [Obsolete("Not used any more, however if won't delete the class since it could be useful at some point")]
+    public void SaveToCache(List<TvdbMirror> mirrorInfo)
+    {
+      if (mirrorInfo != null)
+      {
+        if (!Directory.Exists(_rootFolder)) Directory.CreateDirectory(_rootFolder);
+        _filestream = new FileStream(_rootFolder + Path.DirectorySeparatorChar + "mirrorInfo.ser", FileMode.Create);
+        _formatter.Serialize(_filestream, mirrorInfo);
+        _filestream.Close();
+      }
+    }
+
+    /// <summary>
+    /// Load the available mirrors from cache
+    /// </summary>
+    /// <returns>List of available mirrors</returns>
+    [Obsolete("Not used any more, however if won't delete the class since it could be useful at some point")]
+    public List<TvdbMirror> LoadMirrorListFromCache()
+    {
+      if (File.Exists(_rootFolder + Path.DirectorySeparatorChar + "mirrorInfo.ser"))
+      {
+        try
+        {
+          FileStream fs = new FileStream(_rootFolder + Path.DirectorySeparatorChar + "mirrorInfo.ser", FileMode.Open);
+          List<TvdbMirror> retValue = (List<TvdbMirror>) _formatter.Deserialize(fs);
+          fs.Close();
+          return retValue;
+        }
+        catch (SerializationException)
+        {
+          return null;
+        }
+      }
+      return null;
+    }
   }
 }

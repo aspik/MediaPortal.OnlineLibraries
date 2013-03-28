@@ -32,15 +32,15 @@ namespace MediaPortal.OnlineLibraries
     protected bool _enableCompression;
     protected int _requestTimeOut = 20000;
 
+    public CompressionWebClient(bool enableCompression)
+    {
+      _enableCompression = enableCompression;
+    }
+
     public int RequestTimeout
     {
       get { return _requestTimeOut; }
       set { _requestTimeOut = value; }
-    }
-
-    public CompressionWebClient (bool enableCompression)
-    {
-      _enableCompression = enableCompression;
     }
 
     protected override WebRequest GetWebRequest(Uri address)
