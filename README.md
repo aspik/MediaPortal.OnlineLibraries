@@ -57,3 +57,13 @@ contact us in [our forums](http://forum.team-mediaportal.com/forums/general.529/
  - MediaPortal.OnlineLibraries.TheGamesDb
  - MediaPortal.OnlineLibraries.Trakt
  - MediaPortal.OnlineLibraries.WorldWeatherOnline
+
+ Known issues
+ ------------
+
+ - It might be possible that building particular projects (*.csproj) only via command line failes because
+of $(SolutionDir) usage within Assembly hint paths. This does not affect building the solution (*.sln).
+For more infos see:
+   - http://nuget.codeplex.com/workitem/1923
+   - http://nuget.codeplex.com/workitem/3094
+   - http://nuget.codeplex.com/discussions/437791
