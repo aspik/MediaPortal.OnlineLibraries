@@ -86,8 +86,8 @@ namespace MPExtended.Libraries.Social.Trakt
           }
         }
 
-
-        Log.Warn("Failed to call Trakt API", e);
+#warning re-enable logging
+        //Log.Warn("Failed to call Trakt API", e);
         return String.Empty;
       }
     }

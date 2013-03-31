@@ -58,7 +58,8 @@ namespace MPExtended.Libraries.Social
       }
       catch (Exception ex)
       {
-        Log.Info("Failed to parse JSON", ex);
+#warning re-enable logging
+        //Log.Info("Failed to parse JSON", ex);
         return default(T);
       }
     }

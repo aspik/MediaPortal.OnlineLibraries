@@ -91,7 +91,8 @@ namespace MPExtended.Libraries.Social.Follwit
       }
       catch (WebException e)
       {
-        Log.Warn("Failed to call Follwit API", e);
+#warning re-enable logging
+        //Log.Warn("Failed to call Follwit API", e);
         return String.Empty;
       }
     }
