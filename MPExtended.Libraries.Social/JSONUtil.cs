@@ -1,4 +1,5 @@
 ﻿#region Copyright (C) 2011-2013 MPExtended
+
 // Copyright (C) 2011-2013 MPExtended Developers, http://www.mpextended.com/
 // 
 // MPExtended is free software: you can redistribute it and/or modify
@@ -13,55 +14,53 @@
 // 
 // You should have received a copy of the GNU General Public License
 // along with MPExtended. If not, see <http://www.gnu.org/licenses/>.
+
 #endregion
 
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Runtime.Serialization.Json;
 using System.Text;
-using MPExtended.Libraries.Service;
 
 namespace MPExtended.Libraries.Social
 {
-    internal class JSONUtil
+  internal class JSONUtil
+  {
+    public static string ToJSON(object obj)
     {
-        public static string ToJSON(object obj)
-        {
-            if (obj == null)
-            {
-                return String.Empty;
-            }
+      if (obj == null)
+      {
+        return String.Empty;
+      }
 
-            using (var ms = new MemoryStream())
-            {
-                var ser = new DataContractJsonSerializer(obj.GetType());
-                ser.WriteObject(ms, obj);
-                return Encoding.UTF8.GetString(ms.ToArray());
-            }
-        }
-
-        public static T FromJSON<T>(string json)
-        {
-            if (String.IsNullOrEmpty(json))
-            {
-                return default(T);
-            }
-
-            try
-            {
-                using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(json.ToCharArray())))
-                {
-                    var ser = new DataContractJsonSerializer(typeof(T));
-                    return (T)ser.ReadObject(ms);
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Info("Failed to parse JSON", ex);
-                return default(T);
-            }
-        }
+      using (MemoryStream ms = new MemoryStream())
+      {
+        DataContractJsonSerializer ser = new DataContractJsonSerializer(obj.GetType());
+        ser.WriteObject(ms, obj);
+        return Encoding.UTF8.GetString(ms.ToArray());
+      }
     }
+
+    public static T FromJSON<T>(string json)
+    {
+      if (String.IsNullOrEmpty(json))
+      {
+        return default(T);
+      }
+
+      try
+      {
+        using (MemoryStream ms = new MemoryStream(Encoding.UTF8.GetBytes(json.ToCharArray())))
+        {
+          DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(T));
+          return (T) ser.ReadObject(ms);
+        }
+      }
+      catch (Exception ex)
+      {
+        Log.Info("Failed to parse JSON", ex);
+        return default(T);
+      }
+    }
+  }
 }

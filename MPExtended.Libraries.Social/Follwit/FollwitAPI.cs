@@ -1,4 +1,5 @@
 ﻿#region Copyright (C) 2011-2013 MPExtended
+
 // Copyright (C) 2011-2013 MPExtended Developers, http://www.mpextended.com/
 // 
 // MPExtended is free software: you can redistribute it and/or modify
@@ -13,88 +14,86 @@
 // 
 // You should have received a copy of the GNU General Public License
 // along with MPExtended. If not, see <http://www.gnu.org/licenses/>.
+
 #endregion
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Net;
 using System.Security.Cryptography;
-using MPExtended.Libraries.Service;
+using System.Text;
 
 namespace MPExtended.Libraries.Social.Follwit
 {
-    internal class FollwitAPI
+  internal class FollwitAPI
+  {
+    // This implementation is based upon the one from the follw.it guys theirselves, which can be found 
+    // here: http://svn.follw.it/api/trunk/. The authentication code is literally copied from their
+    // apidocs: http://follw.it/apidocs/authentication
+
+    public static string GeneratePasswordHash(string password)
     {
-        // This implementation is based upon the one from the follw.it guys theirselves, which can be found 
-        // here: http://svn.follw.it/api/trunk/. The authentication code is literally copied from their
-        // apidocs: http://follw.it/apidocs/authentication
+      // salt + hash
+      string salt = "52c3a0d0-f793-46fb-a4c0-35a0ff6844c8";
+      string saltedPassword = password + salt;
+      string sHash = "";
 
-        public static string GeneratePasswordHash(string password)
-        {
-            // salt + hash
-            string salt = "52c3a0d0-f793-46fb-a4c0-35a0ff6844c8";
-            string saltedPassword = password + salt;
-            string sHash = "";
+      SHA1CryptoServiceProvider sha1Obj = new SHA1CryptoServiceProvider();
+      byte[] bHash = sha1Obj.ComputeHash(Encoding.ASCII.GetBytes(saltedPassword));
 
-            SHA1CryptoServiceProvider sha1Obj = new SHA1CryptoServiceProvider();
-            byte[] bHash = sha1Obj.ComputeHash(Encoding.ASCII.GetBytes(saltedPassword));
-
-            foreach (byte b in bHash)
-                sHash += b.ToString("x2");
-            return sHash;
-        }
-
-        public static FollwitResponse UpdateMovieState(FollwitMovie data, FollwitWatchStatus status)
-        {
-            string url = String.Format(FollwitConfig.URL.WatchMovie, MapToURL(status));
-            string json = CallAPI(url, JSONUtil.ToJSON(data));
-            return JSONUtil.FromJSON<FollwitResponse>(json);
-        }
-
-        public static FollwitResponse UpdateEpisodeState(FollwitEpisode data, FollwitWatchStatus status)
-        {
-            string url = String.Format(FollwitConfig.URL.WatchEpisode, MapToURL(status));
-            string json = CallAPI(url, JSONUtil.ToJSON(data));
-            return JSONUtil.FromJSON<FollwitResponse>(json);
-        }
-
-        public static FollwitResponse TestAccount(FollwitAccountTestData data)
-        {
-            string json = CallAPI(FollwitConfig.URL.TestAccount, JSONUtil.ToJSON(data));
-            return JSONUtil.FromJSON<FollwitResponse>(json);
-        }
-
-        private static string MapToURL(FollwitWatchStatus status)
-        {
-            switch (status)
-            {
-                case FollwitWatchStatus.CancelWatching:
-                    return "unwatching";
-                case FollwitWatchStatus.Watching:
-                    return "watching";
-                case FollwitWatchStatus.Watched:
-                    return "watched";
-                default:
-                    throw new ArgumentException();
-            }
-        }
-
-        private static string CallAPI(string address, string data)
-        {
-            try
-            {
-                WebClient client = new WebClient();
-                client.Encoding = Encoding.UTF8;
-                client.Headers.Add("User-Agent", FollwitConfig.UserAgent);
-                return client.UploadString(address, data);
-            }
-            catch (WebException e)
-            {
-                Log.Warn("Failed to call Follwit API", e);
-                return String.Empty;
-            }
-        }
+      foreach (byte b in bHash)
+        sHash += b.ToString("x2");
+      return sHash;
     }
+
+    public static FollwitResponse UpdateMovieState(FollwitMovie data, FollwitWatchStatus status)
+    {
+      string url = String.Format(FollwitConfig.URL.WatchMovie, MapToURL(status));
+      string json = CallAPI(url, JSONUtil.ToJSON(data));
+      return JSONUtil.FromJSON<FollwitResponse>(json);
+    }
+
+    public static FollwitResponse UpdateEpisodeState(FollwitEpisode data, FollwitWatchStatus status)
+    {
+      string url = String.Format(FollwitConfig.URL.WatchEpisode, MapToURL(status));
+      string json = CallAPI(url, JSONUtil.ToJSON(data));
+      return JSONUtil.FromJSON<FollwitResponse>(json);
+    }
+
+    public static FollwitResponse TestAccount(FollwitAccountTestData data)
+    {
+      string json = CallAPI(FollwitConfig.URL.TestAccount, JSONUtil.ToJSON(data));
+      return JSONUtil.FromJSON<FollwitResponse>(json);
+    }
+
+    private static string MapToURL(FollwitWatchStatus status)
+    {
+      switch (status)
+      {
+        case FollwitWatchStatus.CancelWatching:
+          return "unwatching";
+        case FollwitWatchStatus.Watching:
+          return "watching";
+        case FollwitWatchStatus.Watched:
+          return "watched";
+        default:
+          throw new ArgumentException();
+      }
+    }
+
+    private static string CallAPI(string address, string data)
+    {
+      try
+      {
+        WebClient client = new WebClient();
+        client.Encoding = Encoding.UTF8;
+        client.Headers.Add("User-Agent", FollwitConfig.UserAgent);
+        return client.UploadString(address, data);
+      }
+      catch (WebException e)
+      {
+        Log.Warn("Failed to call Follwit API", e);
+        return String.Empty;
+      }
+    }
+  }
 }

@@ -1,4 +1,5 @@
 ﻿#region Copyright (C) 2011-2013 MPExtended
+
 // Copyright (C) 2011-2013 MPExtended Developers, http://www.mpextended.com/
 // 
 // MPExtended is free software: you can redistribute it and/or modify
@@ -13,33 +14,29 @@
 // 
 // You should have received a copy of the GNU General Public License
 // along with MPExtended. If not, see <http://www.gnu.org/licenses/>.
-#endregion
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using MPExtended.Libraries.Service;
+#endregion
 
 namespace MPExtended.Libraries.Social.Follwit
 {
-    internal class FollwitConfig
+  internal class FollwitConfig
+  {
+    private const string ApiKey = "8YJvxv35baL6e";
+
+    public static string UserAgent
     {
-        private const string ApiKey = "8YJvxv35baL6e";
-
-        public static string UserAgent
-        {
-            get
-            {
-                return VersionUtil.GetUserAgent("FollwitPlugin", "1.0");
-            }
-        }
-
-        internal static class URL
-        {
-            public const string WatchEpisode = @"http://follw.it/api/3/" + ApiKey + "/episode.{0}";
-            public const string WatchMovie = @"http://follw.it/api/3/" + ApiKey + "/movie.{0}";
-            public const string TestAccount = @"http://follw.it/api/3/" + ApiKey + "/user.authenticate";
-        }
+      get { return VersionUtil.GetUserAgent("FollwitPlugin", "1.0"); }
     }
+
+    #region Nested type: URL
+
+    internal static class URL
+    {
+      public const string WatchEpisode = @"http://follw.it/api/3/" + ApiKey + "/episode.{0}";
+      public const string WatchMovie = @"http://follw.it/api/3/" + ApiKey + "/movie.{0}";
+      public const string TestAccount = @"http://follw.it/api/3/" + ApiKey + "/user.authenticate";
+    }
+
+    #endregion
+  }
 }
