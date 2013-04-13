@@ -1,0 +1,832 @@
+﻿#region Copyright (C) 2005-2013 Team MediaPortal
+
+// Copyright (C) 2005-2013 Team MediaPortal
+// http://www.team-mediaportal.com
+// 
+// MediaPortal is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 2 of the License, or
+// (at your option) any later version.
+// 
+// MediaPortal is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with MediaPortal. If not, see <http://www.gnu.org/licenses/>.
+
+#endregion
+
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Text;
+using System.Xml.Linq;
+using MediaPortal.OnlineLibraries.LastFm.Data;
+using MediaPortal.OnlineLibraries.LastFm.Exceptions;
+
+namespace MediaPortal.OnlineLibraries.LastFm
+{
+  public class LastFMLibrary
+  {
+
+    private static string _sessionKey = string.Empty;
+    private static string _currentUser = string.Empty;
+    internal static string BaseURL = "http://ws.audioscrobbler.com/2.0/";
+    internal static string BaseURLHttps = "https://ws.audioscrobbler.com/2.0/";
+
+    #region ctor
+
+    public LastFMLibrary(string sessionkey, string currentUser)
+    {
+      _sessionKey = sessionkey;
+      _currentUser = currentUser;
+    }
+
+    #endregion
+
+    #region properties
+
+    public static string CurrentUser
+    {
+      get
+      {
+        return !string.IsNullOrEmpty(_currentUser) ? _currentUser : string.Empty;
+      }
+    }
+
+    #endregion
+
+    #region lastFM Authentication
+
+    /// <summary>
+    /// Gets a session key (lasts forever) to identify a user to last.fm
+    /// </summary>
+    /// <param name="username">Username</param>
+    /// <param name="password">Password</param>
+    /// <returns>The session key</returns>
+    /// <exception cref="LastFMException">when things go wrong.</exception>
+    public static string AuthGetMobileSession(string username, string password)
+    {
+      var parms = new Dictionary<string, string>();
+      const string methodName = "auth.getMobileSession";
+      parms.Add("username", username);
+      parms.Add("password", password);
+      var buildLastFMString = LastFMHelper.LastFMHelper.BuildLastFMString(parms, methodName, true);
+
+      XDocument xDoc;
+      try
+      {
+        xDoc = GetXml(buildLastFMString, "POST", true);
+      }
+      catch (LastFMException)
+      {
+        throw;
+      }
+      catch (Exception ex)
+      {
+        throw new LastFMException("Exception in AuthGetMobileSession", ex);
+      }
+
+      var sk = xDoc.Descendants("key").FirstOrDefault();
+
+      if (sk != null) _sessionKey = sk.Value;
+      _currentUser = username;
+
+      return _sessionKey;
+
+    }
+
+    #endregion
+
+    #region scrobbling methods
+
+    /// <summary>
+    /// Announce track as now playing on user profile on last.fm website
+    /// </summary>
+    /// <param name="artist">artist of track being played</param>
+    /// <param name="track">name of track being played</param>
+    /// <param name="album">album track being played is part of</param>
+    /// <param name="duration">duration of track being played</param>
+    /// <exception cref="LastFMException">when things go wrong.</exception>
+    public static void UpdateNowPlaying(string artist, string track, string album, string duration)
+    {
+      var parms = new Dictionary<string, string>();
+      const string methodName = "track.updateNowPlaying";
+      parms.Add("artist", artist);
+      parms.Add("track", track);
+      if (!String.IsNullOrEmpty(album))
+      {
+        parms.Add("album", album);
+      }
+      if (!String.IsNullOrEmpty(duration))
+      {
+        parms.Add("duration", duration);
+      }
+      parms.Add("sk", _sessionKey);
+
+      var buildLastFMString = LastFMHelper.LastFMHelper.BuildLastFMString(parms, methodName, true);
+
+      try
+      {
+        GetXml(buildLastFMString, "POST", false);
+      }
+      catch (LastFMException)
+      {
+        throw;
+      }
+      catch (Exception ex)
+      {
+        throw  new LastFMException("Exception in update playing now", ex);
+      }
+    }
+
+
+    /// <summary>
+    /// Scrobble track to last.fm showing as played on user profile on last.fm website.   
+    /// Assumes track is selected by user and scrobble is for current time
+    /// </summary>
+    /// <param name="artist">artist of track that was played</param>
+    /// <param name="trackTitle">name of track that was played</param>
+    /// <param name="album">album that track that was played is part of</param>
+    /// <exception cref="LastFMException">when things go wrong.</exception>
+    public static void Scrobble(string artist, string trackTitle, String album)
+    {
+      Scrobble(artist,trackTitle,album,true,DateTime.UtcNow);
+    }
+
+    /// <summary>
+    /// Scrobble track to last.fm showing as played on user profile on last.fm website
+    /// </summary>
+    /// <param name="artist">artist of track that was played</param>
+    /// <param name="trackTitle">name of track that was played</param>
+    /// <param name="album">album that track that was played is part of</param>
+    /// <param name="isUserSubmitted">True if track was selected by user or false if by system (radio / auto DJ etc)</param> 
+    /// <param name="dtPlayed">Date track was played</param>
+    /// <exception cref="LastFMException">when things go wrong.</exception>
+    public static void Scrobble(string artist, string trackTitle, string album, bool isUserSubmitted,
+                                DateTime dtPlayed)
+    {
+      var track = new LastFMScrobbleTrack
+        {
+          ArtistName = artist,
+          TrackTitle = trackTitle,
+          AlbumName = album,
+          DatePlayed = dtPlayed,
+          UserSelected = isUserSubmitted
+        };
+
+      var tracks = new List<LastFMScrobbleTrack> {track};
+      ScrobbleTracks(tracks);
+    }
+
+    /// <summary>
+    /// Scrobble a collection of tracks
+    /// </summary>
+    /// <param name="tracks">List of tracks to scrobble</param>
+    public static void ScrobbleTracks(List<LastFMScrobbleTrack> tracks)
+    {
+      // only able to scrobble tracks in batches of 50 so split into multiple chunks if needed
+      foreach (var trackList in tracks.InSetsOf(50))
+      {
+        ScrobbleTracksInternal(trackList);
+      }
+    }
+
+    /// <summary>
+    /// We are only able to scrobble at most 50 tracks each time
+    /// Previous step must ensure that list contains 50 or less items
+    /// </summary>
+    /// <param name="tracks">List of tracks to scrobble</param>
+    /// <exception cref="LastFMException">when things go wrong.</exception>
+    private static void ScrobbleTracksInternal(IEnumerable<LastFMScrobbleTrack> tracks)
+    {
+      var parms = new Dictionary<string, string>();
+      const string methodName = "track.scrobble";
+      int i = 0;
+
+      var scrobbleTracks = tracks as IList<LastFMScrobbleTrack> ?? tracks.ToList();
+      foreach (var track in scrobbleTracks)
+      {
+        var span = (track.DatePlayed.ToUniversalTime() - new DateTime(1970, 1, 1));
+        var unixEpoch = (int) span.TotalSeconds;
+
+        parms.Add(string.Format("timestamp[{0}]", i), unixEpoch.ToString(CultureInfo.InvariantCulture));
+        parms.Add(string.Format("artist[{0}]", i), track.ArtistName);
+        parms.Add(string.Format("track[{0}]",i), track.TrackTitle);
+        if (!String.IsNullOrEmpty(track.AlbumName))
+        {
+          parms.Add(string.Format("album[{0}]",i), track.AlbumName);
+        }
+        if (!track.UserSelected)
+        {
+          // parameter used to identify that track has been scrobbled but user did not select it
+          // eg. radio or auto DJ
+          parms.Add(string.Format("chosenByUser[{0}]", i), "0");
+        }
+
+        i++;
+      }
+
+      parms.Add("sk", _sessionKey);
+
+      var buildLastFMString = LastFMHelper.LastFMHelper.BuildLastFMString(parms, methodName, true);
+
+      try
+      {
+        GetXml(buildLastFMString, "POST", false);
+      }
+      catch (LastFMException)
+      {
+        throw;
+      }
+      catch (Exception ex)
+      {
+        throw new LastFMException("Error scrobbling tracks", ex);
+      }
+      
+    }
+
+    /// <summary>
+    /// Cache scrobble to submit to last.fm later
+    /// </summary>
+    /// <param name="artist">artist of track that was played</param>
+    /// <param name="track">name of track that was played</param>
+    /// <param name="album">album that track that was played is part of</param>
+    /// <param name="isUserSubmitted">True if track was selected by user or false if by system (radio / auto DJ etc)</param> 
+    /// <param name="dtPlayed">Date track was played</param>
+    public static void CacheScrobble(string artist, string track, string album, bool isUserSubmitted, DateTime dtPlayed)
+    {
+      //TODO: write to cache file (or database?)
+    }
+
+    public static void SumbitCachedScrobbles()
+    {
+      var tracks = new List<LastFMScrobbleTrack>();
+      //TODO: code to load cached tracks
+      ScrobbleTracks(tracks);
+    }
+
+    #endregion
+
+    #region radio methods
+
+    /// <summary>
+    /// Tune to a radio station.   After runing call GetRadioPlaylist to get the track listing
+    /// </summary>
+    /// <param name="stationURL"></param>
+    public static bool TuneRadio(string stationURL)
+    {
+      var parms = new Dictionary<string, string>();
+      const string methodName = "radio.tune";
+      parms.Add("station", stationURL);
+      parms.Add("sk", _sessionKey);
+
+      var buildLastFMString = LastFMHelper.LastFMHelper.BuildLastFMString(parms, methodName, true);
+
+      try
+      {
+        GetXml(buildLastFMString, "POST", false);
+      }
+      catch (LastFMException)
+      {
+        throw;
+      }
+      catch (Exception ex)
+      {
+        throw new LastFMException("Exception in tune radio", ex);
+      }
+      
+      return true;
+    }
+
+    /// <summary>
+    /// Gets the playlist of radio station (will only be a small number of tracks)
+    /// </summary>
+    /// <returns>A list of tracks</returns>
+    public static List<LastFMStreamingTrack> GetRadioPlaylist()
+    {
+      var parms = new Dictionary<string, string>();
+      const string methodName = "radio.getPlaylist";
+      parms.Add("bitrate", "128");
+      parms.Add("sk", _sessionKey);
+
+      var buildLastFMString = LastFMHelper.LastFMHelper.BuildLastFMString(parms, methodName, true);
+
+      XDocument xDoc;
+      try
+      {
+        xDoc = GetXml(buildLastFMString, "GET", false);
+      }
+      catch (LastFMException)
+      {
+        throw;
+      }
+      catch (Exception ex)
+      {
+        throw  new LastFMException("Exception in GetRadioPlaylist", ex);
+      }
+
+      XNamespace ns = "http://xspf.org/ns/0/";
+      var tracks = (from a in xDoc.Descendants(ns + "track")
+               select new LastFMStreamingTrack
+                        {
+                          ArtistName = (string) a.Element(ns + "creator"),
+                          TrackTitle = (string) a.Element(ns + "title"),
+                          TrackStreamingURL = (string) a.Element(ns + "location"),
+                          Duration = Int32.Parse((string) a.Element(ns + "duration")) / 1000,
+                          Identifier = Int32.Parse((string) a.Element(ns + "identifier")),
+                          ImageURL = (string) a.Element(ns + "image")
+                        }).ToList();
+      return tracks;
+    }
+
+    #endregion
+
+    #region track methods
+
+    /// <summary>
+    /// Get info about the track
+    /// </summary>
+    /// <param name="artist">Artist Name</param>
+    /// <param name="track">Track Title</param>
+    public static LastFMTrackInfo GetTrackInfo(string artist, string track)
+    {
+      var parms = new Dictionary<string, string>();
+      const string methodName = "track.getInfo";
+      parms.Add("artist", artist);
+      parms.Add("track", track);
+      var buildLastFMString = LastFMHelper.LastFMHelper.BuildLastFMString(parms, methodName, true);
+
+      LastFMTrackInfo trackInfo;
+      try
+      {
+        var xDoc = GetXml(buildLastFMString, "GET", false);
+        trackInfo = new LastFMTrackInfo(xDoc);
+      }
+      catch (LastFMException)
+      {
+        throw;
+      }
+      catch (Exception ex)
+      {
+        throw new LastFMException("Exception in getting track info", ex);
+      }
+      
+      return trackInfo;
+    }
+
+
+    /// <summary>
+    /// Pickup similar tracks to the details provided.   These tracks may not
+    /// </summary>
+    /// <param name="track">name of track to use for lookup</param>
+    /// <param name="artist">artist of track to use for lookup</param>
+    /// <returns>A list of similar tracks from last.fm.  
+    ///          There is no check to see if the user has access to these tracks
+    ///          See GetSimilarTracksInDatabase to only return tracks in music database</returns>
+    public static List<LastFMSimilarTrack> GetSimilarTracks(string track, string artist)
+    {
+      var parms = new Dictionary<string, string>();
+      const string methodName = "track.getSimilar";
+      parms.Add("track", track);
+      parms.Add("artist", artist);
+      parms.Add("autocorrect", "1");
+
+      XDocument xDoc;
+      var buildLastFMString = LastFMHelper.LastFMHelper.BuildLastFMString(parms, methodName, false);
+      try
+      {
+        xDoc = GetXml(buildLastFMString, "GET", false);
+      }
+      catch (LastFMException)
+      {
+        throw;
+      }
+      catch (Exception ex)
+      {
+        throw new LastFMException("Exception in getting track info", ex);
+      }
+
+      var tracks = (from t in xDoc.Descendants("track")
+                     let trackName = (string) t.Element("name")
+                     let playcount = (int) t.Element("playcount")
+                     let mbid = (string) t.Element("mbid")
+                     let duration = (int) t.Element("duration")
+                     let match = (float) t.Element("match")
+                     let trackURL = (string) t.Element("url")
+                     let artistElement = t.Element("artist")
+                     where artistElement != null
+                     let artistName = (string) artistElement.Element("name")
+                     let images = (
+                                    from i in t.Elements("image")
+                                    select new LastFMImage(
+                                      LastFMImage.GetImageSizeEnum((string) i.Attribute("size")),
+                                      (string) i
+                                      )
+                                  ).ToList()
+                     select new LastFMSimilarTrack
+                       {
+                         TrackTitle = trackName,
+                         Playcount = playcount,
+                         MusicBrainzId = mbid,
+                         Duration = duration,
+                         Match = match,
+                         TrackURL = trackURL,
+                         ArtistName = artistName,
+                         Images = images
+                       }
+                    ).ToList();
+
+      return tracks;
+    }
+
+    /// <summary>
+    /// Marks a track as loved on last.fm
+    /// </summary>
+    /// <param name="artist">Artist Name</param>
+    /// <param name="track">Track Title</param>
+    /// <returns>True if successful</returns>
+    public static bool LoveTrack(string artist, string track)
+    {
+      var parms = new Dictionary<string, string>();
+      const string methodName = "track.love";
+      parms.Add("artist", artist);
+      parms.Add("track", track);
+      parms.Add("sk", _sessionKey);
+
+      var buildLastFMString = LastFMHelper.LastFMHelper.BuildLastFMString(parms, methodName, true);
+
+      try
+      {
+        GetXml(buildLastFMString, "POST", false);
+      }
+      catch (LastFMException)
+      {
+        throw;
+      }
+      catch (Exception ex)
+      {
+        throw new LastFMException("Exception in getting track info", ex);
+      }
+
+      return true;
+    }
+
+    /// <summary>
+    /// Unmarks a track as loved on last.fm
+    /// </summary>
+    /// <param name="artist">Artist Name</param>
+    /// <param name="track">Track Title</param>
+    /// <returns>True if successful</returns>
+    public static bool UnLoveTrack(string artist, string track)
+    {
+      var parms = new Dictionary<string, string>();
+      const string methodName = "track.unlove";
+      parms.Add("artist", artist);
+      parms.Add("track", track);
+      parms.Add("sk", _sessionKey);
+
+      var buildLastFMString = LastFMHelper.LastFMHelper.BuildLastFMString(parms, methodName, true);
+
+      try
+      {
+        GetXml(buildLastFMString, "POST", false);
+      }
+      catch (LastFMException)
+      {
+        throw;
+      }
+      catch (Exception ex)
+      {
+        throw new LastFMException("Exception in getting track info", ex);
+      }
+
+      return true;
+    }
+
+    /// <summary>
+    /// Marks track as banned on last.fm
+    /// </summary>
+    /// <param name="artist">Artist Name</param>
+    /// <param name="track">Track Title</param>
+    /// <returns>True if successful</returns>
+    public static bool BanTrack(string artist, string track)
+    {
+      var parms = new Dictionary<string, string>();
+      const string methodName = "track.ban";
+      parms.Add("artist", artist);
+      parms.Add("track", track);
+      parms.Add("sk", _sessionKey);
+
+      var buildLastFMString = LastFMHelper.LastFMHelper.BuildLastFMString(parms, methodName, true);
+
+      try
+      {
+        GetXml(buildLastFMString, "POST", false);
+      }
+      catch (LastFMException)
+      {
+        throw;
+      }
+      catch (Exception ex)
+      {
+        throw new LastFMException("Exception in getting track info", ex);
+      }
+
+      return true;
+    }
+
+    /// <summary>
+    /// Unmarks a track as banned on last.fm
+    /// </summary>
+    /// <param name="artist">Artist Name</param>
+    /// <param name="track">Track Title</param>
+    /// <returns>True if successful</returns>
+    public static bool UnBanTrack(string artist, string track)
+    {
+      var parms = new Dictionary<string, string>();
+      const string methodName = "track.unban";
+      parms.Add("artist", artist);
+      parms.Add("track", track);
+      parms.Add("sk", _sessionKey);
+
+      var buildLastFMString = LastFMHelper.LastFMHelper.BuildLastFMString(parms, methodName, true);
+
+      try
+      {
+        GetXml(buildLastFMString, "POST", false);
+      }
+      catch (LastFMException)
+      {
+        throw;
+      }
+      catch (Exception ex)
+      {
+        throw new LastFMException("Exception in getting track info", ex);
+      }
+
+      return true;
+    }
+
+    #endregion
+
+    #region artist methods
+
+    /// <summary>
+    /// Get artist details from last.fm
+    /// </summary>
+    /// <param name="artist">Artist Name</param>
+    public static LastFMFullArtist GetArtistInfo(string artist)
+    {
+      var parms = new Dictionary<string, string>();
+      const string methodName = "artist.getInfo";
+      parms.Add("artist", artist);
+      var buildLastFMString = LastFMHelper.LastFMHelper.BuildLastFMString(parms, methodName, true);
+
+      LastFMFullArtist lastFMFullArtist;
+      try
+      {
+        var xDoc = GetXml(buildLastFMString, "GET", false);
+        lastFMFullArtist = new LastFMFullArtist(xDoc);
+      }
+      catch (LastFMException)
+      {
+        throw;
+      }
+      catch (Exception ex)
+      {
+        throw new LastFMException("Exception in getting track info", ex);
+      }
+
+      return lastFMFullArtist;
+    }
+
+    #endregion
+
+    #region album methods
+
+    /// <summary>
+    /// Get album details
+    /// </summary>
+    /// <param name="artist">Artist Naae</param>
+    /// <param name="album">Album Name</param>
+    /// <exception cref="LastFMException">when things go wrong.</exception>
+    public static LastFMAlbum GetAlbumInfo(string artist, string album)
+    {
+      var parms = new Dictionary<string, string>();
+      const string methodName = "album.getInfo";
+      parms.Add("artist", artist);
+      parms.Add("album", album);
+      var buildLastFMString = LastFMHelper.LastFMHelper.BuildLastFMString(parms, methodName, true);
+
+      LastFMAlbum lastFMAlbum;
+      try
+      {
+        var xDoc = GetXml(buildLastFMString, "GET", false);
+        lastFMAlbum = new LastFMAlbum(xDoc);
+      }
+      catch (LastFMException)
+      {
+        throw;
+      }
+      catch (Exception ex)
+      {
+        throw new LastFMException("Exception when getting album info", ex);
+      }
+
+      return lastFMAlbum;
+    }
+    
+    #endregion
+
+    #region user methods
+
+    /// <summary>
+    /// Get details of the current user
+    /// </summary>
+    /// <returns>User details returned from last.fm</returns>
+    public static LastFMUser GetUserInfo()
+    {
+      // Last.fm API states that if no user is specified that details of the current user will be returned
+      // This is not quite true as it only works if the user is authenticated and the getUserInfo API
+      // call is by default not authenticated.   Passing an empty string to internal function will authenticate
+      // the call so this will return details of current user
+      return GetUserInfo(string.Empty);
+    }
+
+    /// <summary>
+    /// Get details of named user
+    /// </summary>
+    /// <param name="username">Name of user</param>
+    /// <returns>User details returned from last.fm</returns>
+    public static LastFMUser GetUserInfo(string username)
+    {
+      var parms = new Dictionary<string, string>();
+      const string methodName = "user.getInfo";
+      if (!String.IsNullOrEmpty(username))
+      {
+        parms.Add("user", username);
+      }
+      else
+      {
+        parms.Add("sk", _sessionKey);
+      }
+      var buildLastFMString = LastFMHelper.LastFMHelper.BuildLastFMString(parms, methodName, false);
+
+      LastFMUser lastFMUser;
+      try
+      {
+        var xDoc = GetXml(buildLastFMString, "GET", false);
+        lastFMUser = new LastFMUser(xDoc);
+      }
+      catch (LastFMException)
+      {
+        throw;
+      }
+      catch (Exception ex)
+      {
+        throw new LastFMException("Exception in getting track info", ex);
+      }
+
+      return lastFMUser;
+    }
+
+    #endregion
+
+    #region HTTP methods
+
+    /// <summary>
+    /// Attempt to get XML web response via HTTP
+    /// </summary>
+    /// <param name="querystring">Querystring to be passed to webservice</param>
+    /// <param name="httpMethod">GET or POST</param>
+    /// <param name="useHttps">Whether to use HTTPS</param>
+    /// <returns>The xml returned by Webservice</returns>
+    /// <exception cref="LastFMException">Details of last.fm error or will wrap actual exception as inner exception</exception>
+    private static XDocument GetXml(string querystring, string httpMethod, bool useHttps)
+    {
+      HttpWebResponse response;
+      XDocument xDoc;
+      var url = useHttps ? BaseURLHttps : BaseURL;
+      if (httpMethod == "GET")
+      {
+        url = url + "?" + querystring;
+      }
+
+      try
+      {
+        var postArray = Encoding.UTF8.GetBytes(querystring);
+        var request = (HttpWebRequest) WebRequest.Create(url);
+        request.Method = httpMethod;
+        request.ServicePoint.Expect100Continue = false;
+        if (httpMethod == "POST")
+        {
+          request.ContentType = "application/x-www-form-urlencoded";
+          request.ContentLength = postArray.Length;
+          var s = request.GetRequestStream();
+          s.Write(postArray, 0, postArray.Length);
+          s.Close();
+        }
+        response = (HttpWebResponse) request.GetResponse();
+      }
+      catch (WebException ex)
+      {
+        if (ex.Status == WebExceptionStatus.ProtocolError)
+        {
+          // errors on last.fm side such as invalid API key, are returned as HTTP errors
+          // just process these as a standard return
+          response = (HttpWebResponse) ex.Response;
+        }
+        else
+        {
+          throw new LastFMException("Error in HTTP Request", ex);
+        }
+      }
+      catch (Exception ex)
+      {
+        throw new LastFMException("Error in HTTP Request", ex);
+      }
+
+      try
+      {
+        using (var stream = response.GetResponseStream())
+        using (var reader = new StreamReader(stream))
+        {
+          var resp = reader.ReadToEnd();
+          xDoc = XDocument.Parse(resp);
+        }
+      }
+      catch (Exception ex)
+      {
+        throw new LastFMException("Error in HTTP response", ex);
+      }
+
+      if ((string) xDoc.Root.Attribute("status") != "ok")
+      {
+        throw GetLastFMException(xDoc);
+      }
+
+      return xDoc;
+    }
+
+    #endregion
+
+    #region exception handling
+
+    /// <summary>
+    /// Parse xml error returned from last.fm and convert into an exception
+    /// </summary>
+    /// <param name="xDoc">xml error returned from last.fm</param>
+    /// <returns></returns>
+    private static LastFMException GetLastFMException(XContainer xDoc)
+    {
+      //default values just in case xml is malformed or corrupted
+      var errorMsg = "Last.fm Error";
+      int i = 999; 
+      var error = xDoc.Descendants("error").FirstOrDefault();
+      if (error != null)
+      {
+        i = (int)error.Attribute("code");
+        errorMsg = (string) error;
+      }
+      return new LastFMException(errorMsg) { LastFMError = (LastFMException.LastFMErrorCode)i };
+    }
+
+    #endregion
+
+  }
+
+  internal static class ExtensionMethods
+  {
+    /// <summary>
+    /// LINQ extension method to chunk a collection into smaller lists of a fixed size
+    /// Eg. last.fm submissions can contain at most 50 tracks but there might be more than
+    /// 50 tracks to submit so chunk the input into n lists of max size 50
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source">Collection to split into chunks</param>
+    /// <param name="max">Max number of elements list can contain</param>
+    /// <returns>Lists that have at most max elements</returns>
+    internal static IEnumerable<List<T>> InSetsOf<T>(this IEnumerable<T> source, int max)
+    {
+      var toReturn = new List<T>(max);
+      foreach (var item in source)
+      {
+        toReturn.Add(item);
+        if (toReturn.Count != max) continue;
+        yield return toReturn;
+        toReturn = new List<T>(max);
+      }
+      if (toReturn.Any())
+      {
+        yield return toReturn;
+      }
+    }
+  }
+
+}
