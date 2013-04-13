@@ -77,20 +77,7 @@ namespace MediaPortal.OnlineLibraries.LastFm
       parms.Add("username", username);
       parms.Add("password", password);
       var buildLastFMString = LastFMHelper.LastFMHelper.BuildLastFMString(parms, methodName, true);
-
-      XDocument xDoc;
-      try
-      {
-        xDoc = GetXml(buildLastFMString, "POST", true);
-      }
-      catch (LastFMException)
-      {
-        throw;
-      }
-      catch (Exception ex)
-      {
-        throw new LastFMException("Exception in AuthGetMobileSession", ex);
-      }
+      var xDoc = GetXml(buildLastFMString, "POST", true);
 
       var sk = xDoc.Descendants("key").FirstOrDefault();
 
@@ -130,19 +117,7 @@ namespace MediaPortal.OnlineLibraries.LastFm
       parms.Add("sk", _sessionKey);
 
       var buildLastFMString = LastFMHelper.LastFMHelper.BuildLastFMString(parms, methodName, true);
-
-      try
-      {
-        GetXml(buildLastFMString, "POST", false);
-      }
-      catch (LastFMException)
-      {
-        throw;
-      }
-      catch (Exception ex)
-      {
-        throw  new LastFMException("Exception in update playing now", ex);
-      }
+      GetXml(buildLastFMString, "POST", false);
     }
 
 
@@ -217,10 +192,10 @@ namespace MediaPortal.OnlineLibraries.LastFm
 
         parms.Add(string.Format("timestamp[{0}]", i), unixEpoch.ToString(CultureInfo.InvariantCulture));
         parms.Add(string.Format("artist[{0}]", i), track.ArtistName);
-        parms.Add(string.Format("track[{0}]",i), track.TrackTitle);
+        parms.Add(string.Format("track[{0}]", i), track.TrackTitle);
         if (!String.IsNullOrEmpty(track.AlbumName))
         {
-          parms.Add(string.Format("album[{0}]",i), track.AlbumName);
+          parms.Add(string.Format("album[{0}]", i), track.AlbumName);
         }
         if (!track.UserSelected)
         {
@@ -235,20 +210,7 @@ namespace MediaPortal.OnlineLibraries.LastFm
       parms.Add("sk", _sessionKey);
 
       var buildLastFMString = LastFMHelper.LastFMHelper.BuildLastFMString(parms, methodName, true);
-
-      try
-      {
-        GetXml(buildLastFMString, "POST", false);
-      }
-      catch (LastFMException)
-      {
-        throw;
-      }
-      catch (Exception ex)
-      {
-        throw new LastFMException("Error scrobbling tracks", ex);
-      }
-      
+      GetXml(buildLastFMString, "POST", false);
     }
 
     /// <summary>
@@ -287,20 +249,8 @@ namespace MediaPortal.OnlineLibraries.LastFm
       parms.Add("sk", _sessionKey);
 
       var buildLastFMString = LastFMHelper.LastFMHelper.BuildLastFMString(parms, methodName, true);
+      GetXml(buildLastFMString, "POST", false);
 
-      try
-      {
-        GetXml(buildLastFMString, "POST", false);
-      }
-      catch (LastFMException)
-      {
-        throw;
-      }
-      catch (Exception ex)
-      {
-        throw new LastFMException("Exception in tune radio", ex);
-      }
-      
       return true;
     }
 
@@ -316,20 +266,7 @@ namespace MediaPortal.OnlineLibraries.LastFm
       parms.Add("sk", _sessionKey);
 
       var buildLastFMString = LastFMHelper.LastFMHelper.BuildLastFMString(parms, methodName, true);
-
-      XDocument xDoc;
-      try
-      {
-        xDoc = GetXml(buildLastFMString, "GET", false);
-      }
-      catch (LastFMException)
-      {
-        throw;
-      }
-      catch (Exception ex)
-      {
-        throw  new LastFMException("Exception in GetRadioPlaylist", ex);
-      }
+      var xDoc = GetXml(buildLastFMString, "GET", false);
 
       XNamespace ns = "http://xspf.org/ns/0/";
       var tracks = (from a in xDoc.Descendants(ns + "track")
@@ -361,22 +298,9 @@ namespace MediaPortal.OnlineLibraries.LastFm
       parms.Add("artist", artist);
       parms.Add("track", track);
       var buildLastFMString = LastFMHelper.LastFMHelper.BuildLastFMString(parms, methodName, true);
+      var xDoc = GetXml(buildLastFMString, "GET", false);
+      var trackInfo = new LastFMTrackInfo(xDoc);
 
-      LastFMTrackInfo trackInfo;
-      try
-      {
-        var xDoc = GetXml(buildLastFMString, "GET", false);
-        trackInfo = new LastFMTrackInfo(xDoc);
-      }
-      catch (LastFMException)
-      {
-        throw;
-      }
-      catch (Exception ex)
-      {
-        throw new LastFMException("Exception in getting track info", ex);
-      }
-      
       return trackInfo;
     }
 
@@ -397,20 +321,8 @@ namespace MediaPortal.OnlineLibraries.LastFm
       parms.Add("artist", artist);
       parms.Add("autocorrect", "1");
 
-      XDocument xDoc;
       var buildLastFMString = LastFMHelper.LastFMHelper.BuildLastFMString(parms, methodName, false);
-      try
-      {
-        xDoc = GetXml(buildLastFMString, "GET", false);
-      }
-      catch (LastFMException)
-      {
-        throw;
-      }
-      catch (Exception ex)
-      {
-        throw new LastFMException("Exception in getting track info", ex);
-      }
+      var xDoc = GetXml(buildLastFMString, "GET", false);
 
       var tracks = (from t in xDoc.Descendants("track")
                      let trackName = (string) t.Element("name")
@@ -460,19 +372,7 @@ namespace MediaPortal.OnlineLibraries.LastFm
       parms.Add("sk", _sessionKey);
 
       var buildLastFMString = LastFMHelper.LastFMHelper.BuildLastFMString(parms, methodName, true);
-
-      try
-      {
-        GetXml(buildLastFMString, "POST", false);
-      }
-      catch (LastFMException)
-      {
-        throw;
-      }
-      catch (Exception ex)
-      {
-        throw new LastFMException("Exception in getting track info", ex);
-      }
+      GetXml(buildLastFMString, "POST", false);
 
       return true;
     }
@@ -492,19 +392,7 @@ namespace MediaPortal.OnlineLibraries.LastFm
       parms.Add("sk", _sessionKey);
 
       var buildLastFMString = LastFMHelper.LastFMHelper.BuildLastFMString(parms, methodName, true);
-
-      try
-      {
-        GetXml(buildLastFMString, "POST", false);
-      }
-      catch (LastFMException)
-      {
-        throw;
-      }
-      catch (Exception ex)
-      {
-        throw new LastFMException("Exception in getting track info", ex);
-      }
+      GetXml(buildLastFMString, "POST", false);
 
       return true;
     }
@@ -524,19 +412,7 @@ namespace MediaPortal.OnlineLibraries.LastFm
       parms.Add("sk", _sessionKey);
 
       var buildLastFMString = LastFMHelper.LastFMHelper.BuildLastFMString(parms, methodName, true);
-
-      try
-      {
-        GetXml(buildLastFMString, "POST", false);
-      }
-      catch (LastFMException)
-      {
-        throw;
-      }
-      catch (Exception ex)
-      {
-        throw new LastFMException("Exception in getting track info", ex);
-      }
+      GetXml(buildLastFMString, "POST", false);
 
       return true;
     }
@@ -556,19 +432,7 @@ namespace MediaPortal.OnlineLibraries.LastFm
       parms.Add("sk", _sessionKey);
 
       var buildLastFMString = LastFMHelper.LastFMHelper.BuildLastFMString(parms, methodName, true);
-
-      try
-      {
-        GetXml(buildLastFMString, "POST", false);
-      }
-      catch (LastFMException)
-      {
-        throw;
-      }
-      catch (Exception ex)
-      {
-        throw new LastFMException("Exception in getting track info", ex);
-      }
+      GetXml(buildLastFMString, "POST", false);
 
       return true;
     }
@@ -587,21 +451,8 @@ namespace MediaPortal.OnlineLibraries.LastFm
       const string methodName = "artist.getInfo";
       parms.Add("artist", artist);
       var buildLastFMString = LastFMHelper.LastFMHelper.BuildLastFMString(parms, methodName, true);
-
-      LastFMFullArtist lastFMFullArtist;
-      try
-      {
-        var xDoc = GetXml(buildLastFMString, "GET", false);
-        lastFMFullArtist = new LastFMFullArtist(xDoc);
-      }
-      catch (LastFMException)
-      {
-        throw;
-      }
-      catch (Exception ex)
-      {
-        throw new LastFMException("Exception in getting track info", ex);
-      }
+      var xDoc = GetXml(buildLastFMString, "GET", false);
+      var lastFMFullArtist = new LastFMFullArtist(xDoc);
 
       return lastFMFullArtist;
     }
@@ -622,26 +473,14 @@ namespace MediaPortal.OnlineLibraries.LastFm
       const string methodName = "album.getInfo";
       parms.Add("artist", artist);
       parms.Add("album", album);
-      var buildLastFMString = LastFMHelper.LastFMHelper.BuildLastFMString(parms, methodName, true);
 
-      LastFMAlbum lastFMAlbum;
-      try
-      {
-        var xDoc = GetXml(buildLastFMString, "GET", false);
-        lastFMAlbum = new LastFMAlbum(xDoc);
-      }
-      catch (LastFMException)
-      {
-        throw;
-      }
-      catch (Exception ex)
-      {
-        throw new LastFMException("Exception when getting album info", ex);
-      }
+      var buildLastFMString = LastFMHelper.LastFMHelper.BuildLastFMString(parms, methodName, true);
+      var xDoc = GetXml(buildLastFMString, "GET", false);
+      var lastFMAlbum = new LastFMAlbum(xDoc);
 
       return lastFMAlbum;
     }
-    
+
     #endregion
 
     #region user methods
@@ -677,21 +516,8 @@ namespace MediaPortal.OnlineLibraries.LastFm
         parms.Add("sk", _sessionKey);
       }
       var buildLastFMString = LastFMHelper.LastFMHelper.BuildLastFMString(parms, methodName, false);
-
-      LastFMUser lastFMUser;
-      try
-      {
-        var xDoc = GetXml(buildLastFMString, "GET", false);
-        lastFMUser = new LastFMUser(xDoc);
-      }
-      catch (LastFMException)
-      {
-        throw;
-      }
-      catch (Exception ex)
-      {
-        throw new LastFMException("Exception in getting track info", ex);
-      }
+      var xDoc = GetXml(buildLastFMString, "GET", false);
+      var lastFMUser = new LastFMUser(xDoc);
 
       return lastFMUser;
     }
@@ -718,20 +544,20 @@ namespace MediaPortal.OnlineLibraries.LastFm
         url = url + "?" + querystring;
       }
 
+      var postArray = Encoding.UTF8.GetBytes(querystring);
+      var request = (HttpWebRequest) WebRequest.Create(url);
+      request.Method = httpMethod;
+      request.ServicePoint.Expect100Continue = false;
+      if (httpMethod == "POST")
+      {
+        request.ContentType = "application/x-www-form-urlencoded";
+        request.ContentLength = postArray.Length;
+        var s = request.GetRequestStream();
+        s.Write(postArray, 0, postArray.Length);
+        s.Close();
+      }
       try
       {
-        var postArray = Encoding.UTF8.GetBytes(querystring);
-        var request = (HttpWebRequest) WebRequest.Create(url);
-        request.Method = httpMethod;
-        request.ServicePoint.Expect100Continue = false;
-        if (httpMethod == "POST")
-        {
-          request.ContentType = "application/x-www-form-urlencoded";
-          request.ContentLength = postArray.Length;
-          var s = request.GetRequestStream();
-          s.Write(postArray, 0, postArray.Length);
-          s.Close();
-        }
         response = (HttpWebResponse) request.GetResponse();
       }
       catch (WebException ex)
@@ -744,27 +570,17 @@ namespace MediaPortal.OnlineLibraries.LastFm
         }
         else
         {
-          throw new LastFMException("Error in HTTP Request", ex);
+          throw;
         }
-      }
-      catch (Exception ex)
-      {
-        throw new LastFMException("Error in HTTP Request", ex);
       }
 
-      try
+      using (var stream = response.GetResponseStream())
+      using (var reader = new StreamReader(stream))
       {
-        using (var stream = response.GetResponseStream())
-        using (var reader = new StreamReader(stream))
-        {
-          var resp = reader.ReadToEnd();
-          xDoc = XDocument.Parse(resp);
-        }
+        var resp = reader.ReadToEnd();
+        xDoc = XDocument.Parse(resp);
       }
-      catch (Exception ex)
-      {
-        throw new LastFMException("Error in HTTP response", ex);
-      }
+
 
       if ((string) xDoc.Root.Attribute("status") != "ok")
       {
